@@ -1,0 +1,176 @@
+env_settings:                   #配置运行时环境变量
+  enable_log: true             #开启全局log  [bool]
+
+models:
+  person_det:
+    path: "/data/workspace/wangjing/sophon-demo-release/sample/YOLOv8_plus_det/models/BM1684X/det_person_yolov8n_1684x_f16.bmodel"
+    init_func_name: "init_yolov8_det_model"
+    function_name: "inference_yolo_person_det_model"
+    function_type: yolo_det
+    is_quant: true                #量化标志 [bool]
+    params:
+      input_height: 640           #模型推理高度 [int]  根据模型名获得 
+      input_width: 640            #模型推理宽度 [int]  根据模型名获得 
+      nms_threshold: 0.7          #NMS阈值 [float]
+      box_threshold: 0.4          #box得分阈值 [float]
+    enable_log: true
+  header_det:
+    path: "model/det_header_yolov8n_640x640_250328.rknn"
+    function_name: "inference_header_det_model"
+    function_type: yolo_det  # 函数输入输出参数类型相同
+    is_quant: true                #量化标志 [bool]
+    params:
+      input_height: 640           #模型推理高度 [int]  根据模型名获得 
+      input_width: 640            #模型推理宽度 [int]  根据模型名获得 
+      nms_threshold: 0.6          #NMS阈值 [float]
+      box_threshold: 0.5          #box得分阈值 [float]
+    enable_log: false
+  phone_det:
+    path: "model/PhoneDet.rknn"
+    function_name: "inference_phone_det_model"
+    function_type: ssd_det
+    enable_log: false
+  det_knife:
+    path: "model/yolov8n_1105_det_knife_i8.rknn"
+    function_name: "inference_det_knife_model"
+    function_type: yolo_det
+    is_quant: true                #量化标志 [bool]
+    params:
+      input_height: 640           #模型推理高度 [int]  根据模型名获得 
+      input_width: 640            #模型推理宽度 [int]  根据模型名获得 
+      nms_threshold: 0.6          #NMS阈值 [float]
+      box_threshold: 0.25         #box得分阈值 [float]
+    enable_log: false              #log标志 [bool]
+  det_gun:
+    path: "model/det_gun_yv8s_250327_480x480_i8.rknn"
+    function_name: "inference_det_gun_model"
+    function_type: yolo_det
+    num_npu: 1
+    is_quant: true                #量化标志 [bool]
+    params:
+      input_height: 480           #模型推理高度 [int]  根据模型名获得 
+      input_width: 480            #模型推理宽度 [int]  根据模型名获得 
+      nms_threshold: 0.6          #NMS阈值 [float]
+      box_threshold: 0.65         #box得分阈值 [float]
+    enable_log: true              #log标志 [bool]
+  det_yyc:
+    path: "model/det_yyc_yv8s_250329_480x480_i8.rknn"
+    function_name: "inference_det_vehicle_model"
+    function_type: yolo_det
+    is_quant: true                #量化标志 [bool]
+    params:
+      input_height: 480           #模型推理高度 [int]  根据模型名获得 
+      input_width: 480            #模型推理宽度 [int]  根据模型名获得 
+      nms_threshold: 0.6          #NMS阈值 [float]
+      box_threshold: 0.65         #box得分阈值 [float]
+    enable_log: true              #log标志 [bool]
+  det_stat_door:
+    path: "model/det_stat_door_yv8s_250225_640x640_i8.rknn"
+    function_name: "inference_det_stat_door_model"
+    function_type: yolo_det
+    is_quant: true                #量化标志 [bool]
+    params:
+      input_height: 640           #模型推理高度 [int]  根据模型名获得 
+      input_width: 640            #模型推理宽度 [int]  根据模型名获得 
+      nms_threshold: 0.6          #NMS阈值 [float]
+      box_threshold: 0.25         #box得分阈值 [float]
+    enable_log: false              #log标志 [bool]
+  face_attr:
+    path: "model/face_v12.rknn"
+    function_name: "inference_face_attr_model"
+    function_type: face_attr
+    enable_log: false
+  ppocr:
+    path: ["model/ppocrv4_det.rknn", "model/ppocrv4_rec.rknn"]
+    function_name: "inference_ppocr_det_rec_model"
+    function_type: "ppocr"
+    enable_log: false
+  det_hand:
+    path: "model/det_hand_s_448x800_250110.rknn"
+    function_name: "inference_det_hand_model"
+    function_type: yolo_det
+    is_quant: true
+    params:
+      input_height: 448           #模型推理高度 [int]  根据模型名获得 
+      input_width: 800            #模型推理宽度 [int]  根据模型名获得 
+      nms_threshold: 0.7          #NMS阈值 [float]
+      box_threshold: 0.25         #box得分阈值 [float]
+    enable_log: false
+  det_kx:
+    path: "model/det_kx_yolov8sd_x0.49_384x640_250213.rknn"
+    function_name: "inference_det_kx_model"
+    function_type: yolo_det
+    params:
+      input_height: 384           #模型推理高度 [int]  根据模型名获得 
+      input_width: 640            #模型推理宽度 [int]  根据模型名获得 
+      nms_threshold: 0.7          #NMS阈值 [float]
+      box_threshold: 0.25         #box得分阈值 [float]
+    enable_log: false
+  rec_ren:
+    path: "model/rec_ren_resnet18_x0.36_256x128_250122.rknn"
+    function_name: "inference_rec_person_resnet18_model"
+    function_type: res_rec
+    params:
+      input_height: 256           #模型推理高度 [int]  根据模型名获得 
+      input_width: 128            #模型推理宽度 [int]  根据模型名获得 
+    enable_log: false
+  rec_ren_mobilenet:
+    path: "model/rec_ren_mobilenetv2_x0.25_256x128_250120.rknn"
+    function_name: "inference_rec_person_mobilenet_model"
+    function_type: res_rec
+    params:
+      input_height: 256           #模型推理高度 [int]  根据模型名获得 
+      input_width: 128            #模型推理宽度 [int]  根据模型名获得 
+    enable_log: false
+  rec_hand:
+    path: "model/rec_hand_1216_resnet18.rknn"
+    function_name: "inference_rec_hand_resnet18_model"
+    function_type: res_rec
+    params:
+      input_height: 224           #模型推理高度 [int]  根据模型名获得 
+      input_width: 224            #模型推理宽度 [int]  根据模型名获得 
+    enable_log: false
+  rec_kx_orient:
+    path: "model/rec_kx_orient_1207_resnet18.rknn"
+    function_name: "inference_rec_kx_orient_resnet18_model"
+    function_type: res_rec
+    params:
+      input_height: 224           #模型推理高度 [int]  根据模型名获得 
+      input_width: 224            #模型推理宽度 [int]  根据模型名获得 
+    enable_log: false
+  rec_stat_door:
+    path: "model/cls_stat_door_res18_250217_256x128_i8.rknn"  #模型文件存放地址    任务_模型架构_日期_推理尺寸_[量化数据类型].[后缀]
+    # function_name: "inference_rec_stat_door_resnet18_model"
+    function_name: "inference_rec_stat_door_resnet18_model_opencv"
+    function_type: res_rec
+    is_quant: true
+    params:
+      input_height: 256           #模型推理高度 [int]  根据模型名获得 
+      input_width: 128            #模型推理宽度 [int]  根据模型名获得 
+    enable_log: false
+  pose_ren:
+    path: "model/yolov8s-pose.rknn"
+    function_name: "inference_pose_ren_model"
+    function_type: pose
+    enable_log: false
+  pose_kx_hp:
+    path: "model/pose_kx_hp_s_24_12_12.rknn"
+    function_name: "inference_pose_kx_hp_model"
+    function_type: pose
+    enable_log: false
+  pose_kx_sz: 
+    path: "model/pose_kx_sz_s_24_12_07.rknn"
+    function_name: "inference_pose_kx_sz_model"
+    function_type: pose
+    enable_log: false
+  obb_stick:
+    path: "model/obb_stick_yv8s_250327_800x800_i8.rknn"
+    function_name: "inference_obb_stick_model"
+    function_type: obb_det
+    is_quant: true
+    params:
+      input_height: 800
+      input_width: 800
+      nms_threshold: 0.6
+      box_threshold: 0.65
+    enable_log: false 
