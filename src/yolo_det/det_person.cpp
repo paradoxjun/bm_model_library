@@ -11,11 +11,6 @@ using json = nlohmann::json;
 using namespace std;
 
 
-std::vector<std::string> model_class_names = {
-    "person",
-    // "header"
-};
-
 /*-------------------------------------------
                   Main Function
 -------------------------------------------*/
@@ -23,10 +18,9 @@ std::vector<std::string> model_class_names = {
 extern "C" {          // 确保函数名称不会在导出时被修饰
 #endif
 
-YoloV8_det* init_yolov8_det_model(string bmodel_file, int dev_id, model_inference_params params){
+YoloV8_det* init_yolov8_det_model(string bmodel_file, int dev_id, model_inference_params params, std::vector<std::string> model_class_names){
     // YoloV8_det yolov8(bmodel_file, model_class_names, dev_id, conf_thresh, nms_thresh);
     // return yolov8;
-
     return new YoloV8_det(bmodel_file, model_class_names, dev_id, params.box_threshold, params.nms_threshold);
 }
 
@@ -175,38 +169,38 @@ int inference_yolo_person_det_model_batch(){
 }
 #endif
 
-static int load_batch_bm_images(string input_path, vector<cv::Mat>& batch_mats, vector<bm_image>& batch_imgs, vector<string>& batch_names){
-    int dev_id = 0;
-    vector<string> files_vector;
-    DIR* pDir;
-    struct dirent* ptr;
-    pDir = opendir(input_path.c_str());
-    while ((ptr = readdir(pDir)) != 0) {
-        if (strcmp(ptr->d_name, ".") != 0 && strcmp(ptr->d_name, "..") != 0) {
-            files_vector.push_back(input_path + "/" + ptr->d_name);
-        }
-    }
-    closedir(pDir);
+// static int load_batch_bm_images(string input_path, vector<cv::Mat>& batch_mats, vector<bm_image>& batch_imgs, vector<string>& batch_names){
+//     int dev_id = 0;
+//     vector<string> files_vector;
+//     DIR* pDir;
+//     struct dirent* ptr;
+//     pDir = opendir(input_path.c_str());
+//     while ((ptr = readdir(pDir)) != 0) {
+//         if (strcmp(ptr->d_name, ".") != 0 && strcmp(ptr->d_name, "..") != 0) {
+//             files_vector.push_back(input_path + "/" + ptr->d_name);
+//         }
+//     }
+//     closedir(pDir);
 
-    int cn = files_vector.size();
-    int id = 0;
-    std::sort(files_vector.begin(), files_vector.end());
-    for (vector<string>::iterator iter = files_vector.begin(); iter != files_vector.end(); iter++) {
-        string img_file = *iter;
-        id++;
-        cout << id << "/" << cn << ", img_file: " << img_file << endl;
-        bm_image bmimg;
-        cv::Mat mat = cv::imread(img_file, cv::IMREAD_COLOR, dev_id);
-        if(mat.empty()){
-            cout << "Decode error! Skipping current img." << endl;
-            continue;
-        }
-        cv::bmcv::toBMI(mat, &bmimg);
-        size_t index = img_file.rfind("/");
-        string img_name = img_file.substr(index + 1);
-        batch_mats.push_back(mat);
-        batch_imgs.push_back(bmimg);
-        batch_names.push_back(img_name);
-    }
-    return 0;
-}
+//     int cn = files_vector.size();
+//     int id = 0;
+//     std::sort(files_vector.begin(), files_vector.end());
+//     for (vector<string>::iterator iter = files_vector.begin(); iter != files_vector.end(); iter++) {
+//         string img_file = *iter;
+//         id++;
+//         cout << id << "/" << cn << ", img_file: " << img_file << endl;
+//         bm_image bmimg;
+//         cv::Mat mat = cv::imread(img_file, cv::IMREAD_COLOR, dev_id);
+//         if(mat.empty()){
+//             cout << "Decode error! Skipping current img." << endl;
+//             continue;
+//         }
+//         cv::bmcv::toBMI(mat, &bmimg);
+//         size_t index = img_file.rfind("/");
+//         string img_name = img_file.substr(index + 1);
+//         batch_mats.push_back(mat);
+//         batch_imgs.push_back(bmimg);
+//         batch_names.push_back(img_name);
+//     }
+//     return 0;
+// }

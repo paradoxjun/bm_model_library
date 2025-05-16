@@ -10,9 +10,17 @@ export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:${shared_library_abs_directory}
 
 */
 
-typedef YoloV8_det* (*InitYOLODetModelFunc)(std::string bmodel_file, int dev_id, model_inference_params params);
+// yolo det
+typedef YoloV8_det* (*InitYOLODetModelFunc)(std::string bmodel_file, int dev_id, model_inference_params params, std::vector<std::string> model_class_names);
 typedef object_detect_result_list (*InferenceYOLODetModelFunc)(YoloV8_det* model, cv::Mat input_image, bool enable_logger);
 
+// resnet cls
+typedef RESNET* (*InitResNetClsModelFunc)(std::string bmodel_file, int dev_id);
+typedef int (*InferenceResNetClsModelFunc)(RESNET* model, cv::Mat input_image, bool enable_logger);
+
+// face_attr
+typedef RESNET_NC* (*InitFaceAttrModelFunc)(std::string bmodel_file, int dev_id);
+typedef cls_model_result (*InferenceFaceAttrModelFunc)(RESNET_NC* model, cv::Mat input_image, bool enable_logger);
 
 // 加载动态so库
 static int loadSo(const char* soPath, void*& handle) {
@@ -53,6 +61,12 @@ int main(int argc, char** argv) {
 	void* handle = NULL;
 	const char* so_path = "libbm_model_library.so";
 	ret = loadSo(so_path, handle);
+    const char* dlsym_error = dlerror();
+    if (dlsym_error) {
+        std::cerr << "Cannot load symbol :" << dlsym_error << std::endl;
+        dlclose(handle);
+        return 1;
+    }
 
 	// 读取yaml文件
 	YAML::Node config = ReadYamlFile("models.yaml");
@@ -61,43 +75,66 @@ int main(int argc, char** argv) {
 		std::cerr << "Unknown model_name: " << model_name << std::endl;
 		throw std::invalid_argument("Unknown model_name: " + std::string(model_name));
 	}
-
 	const std::string init_func_name = model_node["init_func_name"].as<std::string>();
-	// const std::string init_func_name = "init_yolov8_det_model";
-	InitYOLODetModelFunc init_model = (InitYOLODetModelFunc)dlsym(handle, init_func_name.c_str());
-
 	const std::string infer_func_name = model_node["function_name"].as<std::string>();
-    // const std::string infer_func_name = "inference_yolo_person_det_model";
-    InferenceYOLODetModelFunc inference_model = (InferenceYOLODetModelFunc)dlsym(handle, infer_func_name.c_str());
-    const char* dlsym_error = dlerror();
-    if (dlsym_error) {
-        std::cerr << "Cannot load symbol '" << infer_func_name << "': " << dlsym_error << std::endl;
-        dlclose(handle);
-        return 1;
-    }
 	const std::string bmodel_file = model_node["path"].as<std::string>();
-	model_inference_params params;
-	params.input_height = model_node["params"]["input_height"].as<int>();
-	params.input_width = model_node["params"]["input_width"].as<int>();
-	params.nms_threshold = model_node["params"]["nms_threshold"].as<float>();
-	params.box_threshold = model_node["params"]["box_threshold"].as<float>();
-	// initialize net
-	YoloV8_det* model = init_model(bmodel_file, dev_id, params);
+	const std::string enable_log_str = model_node["enable_log"].as<std::string>();
+	bool enable_log = (enable_log_str == "true" || enable_log_str == "True");
+	const std::string model_type = model_node["model_type"].as<std::string>();
+
 	// 加载图像
 	cv::Mat input_image = cv::imread(image_path, cv::IMREAD_COLOR);
 	if(input_image.empty()) {
 		std::cerr << "Failed to read image: " << image_path << std::endl;
 		return 1;
 	}
-	const std::string enable_log_str = model_node["enable_log"].as<std::string>();
-	bool enable_log = (enable_log_str == "true" || enable_log_str == "True");
-	object_detect_result_list result = inference_model(model, input_image, enable_log);
-	std::cout << "result size: " << result.count << std::endl;
 
-	std::cout << "Success to inference model" << std::endl;
-	delete model;
-	std::cout << "Success to destroy model" << std::endl;
+	if (model_type == "yolo_det") { // yolo检测模型
+		InitYOLODetModelFunc init_model = (InitYOLODetModelFunc)dlsym(handle, init_func_name.c_str());
+		InferenceYOLODetModelFunc inference_model = (InferenceYOLODetModelFunc)dlsym(handle, infer_func_name.c_str());
 
+		model_inference_params params;
+		params.input_height = model_node["params"]["input_height"].as<int>();
+		params.input_width = model_node["params"]["input_width"].as<int>();
+		params.nms_threshold = model_node["params"]["nms_threshold"].as<float>();
+		params.box_threshold = model_node["params"]["box_threshold"].as<float>();
+		// 读取models.yaml文件的class_names
+		std::vector<std::string> class_names;
+		for (const auto& class_name : model_node["class_names"]) {
+			class_names.push_back(class_name.as<std::string>());
+		}
+		// initialize net
+		YoloV8_det* model = init_model(bmodel_file, dev_id, params, class_names);
+		object_detect_result_list result = inference_model(model, input_image, enable_log);
+		std::cout << "result size: " << result.count << std::endl;
+		std::cout << "Success to inference model" << std::endl;
+		delete model;
+		std::cout << "Success to destroy model" << std::endl;
+	}else if (model_type == "res_rec") { // 分类模型
+		std::cout << "Start to inference classification model" << std::endl;
+		InitResNetClsModelFunc init_model = (InitResNetClsModelFunc)dlsym(handle, init_func_name.c_str());
+		InferenceResNetClsModelFunc inference_model = (InferenceResNetClsModelFunc)dlsym(handle, infer_func_name.c_str());
+		RESNET* model = init_model(bmodel_file, dev_id);
+		std::cout << "Success to init model" << std::endl;
+		int ret = inference_model(model, input_image, enable_log);
+		std::cout << "Success to inference model" << std::endl;
+		delete model;
+		std::cout << "Success to destroy model" << std::endl;
+	}else if (model_type == "face_attr") { // 多分类模型
+		std::cout << "Start to inference classification model" << std::endl;
+		InitFaceAttrModelFunc init_model = (InitFaceAttrModelFunc)dlsym(handle, init_func_name.c_str());
+		InferenceFaceAttrModelFunc inference_model = (InferenceFaceAttrModelFunc)dlsym(handle, infer_func_name.c_str());
+		RESNET_NC* model = init_model(bmodel_file, dev_id);
+		std::cout << "Success to init model" << std::endl;
+		cls_model_result result = inference_model(model, input_image, enable_log);
+		std::cout << "Success to inference model" << std::endl;
+		delete model;
+		std::cout << "Success to destroy model" << std::endl;
+	}
+	else {
+		std::cout << "model_type ERROR !" << std::endl;
+	}
+	
 	if (handle != nullptr) {
 		dlclose(handle); 
 		handle = nullptr;

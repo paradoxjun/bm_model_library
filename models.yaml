@@ -3,11 +3,11 @@ env_settings:                   #配置运行时环境变量
 
 models:
   person_det:
-    path: "/data/workspace/wangjing/sophon-demo-release/sample/YOLOv8_plus_det/models/BM1684X/det_person_yolov8n_1684x_f16.bmodel"
+    path: "models/det_person_yolov8n_1684x_f16.bmodel"
     init_func_name: "init_yolov8_det_model"
     function_name: "inference_yolo_person_det_model"
-    function_type: yolo_det
-    is_quant: true                #量化标志 [bool]
+    model_type: yolo_det
+    class_names:  ["person"]
     params:
       input_height: 640           #模型推理高度 [int]  根据模型名获得 
       input_width: 640            #模型推理宽度 [int]  根据模型名获得 
@@ -15,16 +15,25 @@ models:
       box_threshold: 0.4          #box得分阈值 [float]
     enable_log: true
   header_det:
-    path: "model/det_header_yolov8n_640x640_250328.rknn"
-    function_name: "inference_header_det_model"
-    function_type: yolo_det  # 函数输入输出参数类型相同
-    is_quant: true                #量化标志 [bool]
+    path: "models/det_header_1684x_f16.bmodel"
+    init_func_name: "init_yolov8_det_model"
+    function_name: "inference_yolo_person_det_model"
+    model_type: yolo_det  # 函数输入输出参数类型相同
+    class_names:  ["header"]
     params:
       input_height: 640           #模型推理高度 [int]  根据模型名获得 
       input_width: 640            #模型推理宽度 [int]  根据模型名获得 
       nms_threshold: 0.6          #NMS阈值 [float]
       box_threshold: 0.5          #box得分阈值 [float]
-    enable_log: false
+    enable_log: true
+  face_attr:
+    # path: "models/cls_face_1684x_f16.bmodel"
+    path: "models/cls_face_1684x_F32.bmodel"
+    init_func_name: "init_face_attr_model"
+    function_name: "inference_face_attr_model"
+    model_type: face_attr
+    # class_names:  ["hat", "glass", "mask"]
+    enable_log: true
   phone_det:
     path: "model/PhoneDet.rknn"
     function_name: "inference_phone_det_model"
@@ -75,11 +84,6 @@ models:
       nms_threshold: 0.6          #NMS阈值 [float]
       box_threshold: 0.25         #box得分阈值 [float]
     enable_log: false              #log标志 [bool]
-  face_attr:
-    path: "model/face_v12.rknn"
-    function_name: "inference_face_attr_model"
-    function_type: face_attr
-    enable_log: false
   ppocr:
     path: ["model/ppocrv4_det.rknn", "model/ppocrv4_rec.rknn"]
     function_name: "inference_ppocr_det_rec_model"

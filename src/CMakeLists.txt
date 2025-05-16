@@ -16,6 +16,7 @@ file(GLOB_RECURSE HEADER
     )
 file(GLOB_RECURSE SOURCE 
     ${CMAKE_SOURCE_DIR}/src/yolo_det/*.c*
+    ${CMAKE_SOURCE_DIR}/src/classify/*.c*
     )
 message("HEADER: ${HEADER}")
 message("SOURCE: ${SOURCE}")

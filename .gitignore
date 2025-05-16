@@ -2,3 +2,5 @@ build
 *.jpg
 results
 *.soc
+models
+tests
