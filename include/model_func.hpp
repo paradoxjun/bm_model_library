@@ -1,12 +1,11 @@
 #ifndef _BM_MODEL_FUNC_H_
 #define _BM_MODEL_FUNC_H_
 
-#include "yolov8_det.hpp"
-#include "resnet.hpp"
-#include "resnet_nc.hpp"
+#include "models/yolov8_det.hpp"
+#include "models/resnet.hpp"
+#include "models/resnet_nc.hpp"
 #include <opencv2/opencv.hpp>
 
-#define CLASS_MAX_NUM 80  //分类模型最多类别
 
 #ifdef __cplusplus
 extern "C" {
@@ -38,6 +37,17 @@ typedef struct {
 	object_detect_result results[OBJ_NUMB_MAX_SIZE];
 } object_detect_result_list;
 
+//ppocr
+typedef struct {
+  int x1, y1, x2, y2, x3, y3, x4, y4;
+  std::string rec_res;
+  float score;
+}ocr_box;
+typedef struct {
+	int count;
+	ocr_box results[OBJ_NUMB_MAX_SIZE];
+} ocr_result_list;
+
 /* inference params */
 typedef struct model_inference_params {
 	int input_height;
@@ -49,6 +59,7 @@ typedef struct model_inference_params {
 YoloV8_det* init_yolov8_det_model(std::string bmodel_file, int dev_id, model_inference_params params, std::vector<std::string> model_class_names);
 object_detect_result_list inference_yolo_person_det_model(YoloV8_det model, cv::Mat input_image, bool enable_logger);
 object_detect_result_list inference_yolo_header_det_model(YoloV8_det model, cv::Mat input_image, bool enable_logger);
+object_detect_result_list inference_yolo_screen_det_model(YoloV8_det model, cv::Mat input_image, bool enable_logger);
 
 RESNET* init_resnet_cls_model(std::string bmodel_file, int dev_id);
 int inference_resnet_cls_model(RESNET model, cv::Mat input_image, bool enable_logger);
@@ -56,6 +67,10 @@ int inference_resnet_cls_model(RESNET model, cv::Mat input_image, bool enable_lo
 RESNET_NC* init_face_attr_model(std::string bmodel_file, int dev_id);
 cls_model_result inference_face_attr_model(RESNET_NC model, cv::Mat input_image, bool enable_logger);
 
+// PPOCR_Detector* init_ppocr_det_model(std::string bmodel_file, int dev_id);
+// PPOCR_Rec* init_ppocr_rec_model(std::string bmodel_file, int dev_id);
+// int inference_ppocr_det_rec_model(PPOCR_Detector ppocr_det, PPOCR_Rec ppocr_rec);
+ocr_result_list inference_ppocr_det_rec_model(std::string bmodel_det, std::string bmodel_rec, cv::Mat input_image, bool enable_logger);
 #ifdef __cplusplus
 }
 #endif

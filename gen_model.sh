@@ -14,7 +14,7 @@ model=$1"_1684x_"$3".bmodel"
 
 # mlir to fp16 bm_model,yolov8
 #python python/tools/model_deploy.py --mlir yolov8n.mlir --quantize F16 --chip bm1684x --test_input yolov8n_in_f32.npz --test_reference yolov8n_top_outputs.npz --tolerance 0.99,0.99 --model yolov8n_1684x_f16.bmodel
-# python python/tools/model_deploy.py --mlir ${mlir} --quantize F16 --chip bm1684x --test_input ${test_input} --test_reference ${test_result} --tolerance 0.99,0.99 --model ${model}
+# python python/tools/model_deploy.py --mlir ${mlir} --quantize F16 --chip bm1684x --test_input ${model_name}"_in_f32.npz" --test_reference ${test_result} --tolerance 0.99,0.99 --model ${model}
 
 #  resnet50,onnx to mlir, model_def is onnx file
 python python/tools/model_transform.py --model_name ${model_name} --model_def ${model_def} --input_shapes [[1,3,96,96]] --pixel_format bgr --mlir ${mlir}

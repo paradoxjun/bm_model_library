@@ -8,15 +8,23 @@ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-attributes")
 
 include_directories(
     ${CMAKE_SOURCE_DIR}/include
+    ${CMAKE_SOURCE_DIR}/include/models
+    ${CMAKE_SOURCE_DIR}/include/ppocr
+    ${CMAKE_SOURCE_DIR}/include/utils
 )
 
 # 获取所有子目录的头文件到HEADER变量中
 file(GLOB_RECURSE HEADER 
     ${CMAKE_SOURCE_DIR}/include/*.h*
+    ${CMAKE_SOURCE_DIR}/include/models/*.h*
+    ${CMAKE_SOURCE_DIR}/include/ppocr/*.h*
+    ${CMAKE_SOURCE_DIR}/include/utils/*.h*
     )
 file(GLOB_RECURSE SOURCE 
     ${CMAKE_SOURCE_DIR}/src/yolo_det/*.c*
     ${CMAKE_SOURCE_DIR}/src/classify/*.c*
+    ${CMAKE_SOURCE_DIR}/src/utils/*.c*
+    ${CMAKE_SOURCE_DIR}/src/ppocr/*.c*
     )
 message("HEADER: ${HEADER}")
 message("SOURCE: ${SOURCE}")

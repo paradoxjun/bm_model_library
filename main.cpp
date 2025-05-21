@@ -1,6 +1,5 @@
 #include <iostream>
 #include <dlfcn.h>
-
 #include "include/model_func.hpp"
 
 #include "yaml-cpp/yaml.h"
@@ -22,6 +21,11 @@ typedef int (*InferenceResNetClsModelFunc)(RESNET* model, cv::Mat input_image, b
 typedef RESNET_NC* (*InitFaceAttrModelFunc)(std::string bmodel_file, int dev_id);
 typedef cls_model_result (*InferenceFaceAttrModelFunc)(RESNET_NC* model, cv::Mat input_image, bool enable_logger);
 
+// ppocr
+// typedef PPOCR_Detector* (*InitPPOCRDetModelFunc)(std::string bmodel_file, int dev_id);
+// typedef PPOCR_Rec* (*InitPPOCRRecModelFunc)(std::string bmodel_file, int dev_id);
+// typedef int (*InferencePPOCRDetRecModelFunc)(PPOCR_Detector* ppocr_det, PPOCR_Rec* ppocr_rec);
+typedef ocr_result_list (*InferencePPOCRDetRecModelFunc)(std::string bmodel_det, std::string bmodel_rec, cv::Mat input_image, bool enable_logger);
 // 加载动态so库
 static int loadSo(const char* soPath, void*& handle) {
 	handle = dlopen(soPath, RTLD_LAZY);
@@ -130,6 +134,23 @@ int main(int argc, char** argv) {
 		std::cout << "Success to inference model" << std::endl;
 		delete model;
 		std::cout << "Success to destroy model" << std::endl;
+	}else if (model_type == "ppocr") {
+		// std::cout << "init ppocr det model" << std::endl;
+		const std::string det_bmodel_file = model_node["det_path"].as<std::string>();
+		// const std::string init_det_func = model_node["init_det_func_name"].as<std::string>();
+		// InitPPOCRDetModelFunc init_det_model = (InitPPOCRDetModelFunc)dlsym(handle, init_det_func.c_str()); 
+		// PPOCR_Detector* det_model = init_det_model(det_bmodel_file, dev_id);
+		// std::cout << "init ppocr rec model" << std::endl;
+		const std::string rec_bmodel_file = model_node["rec_path"].as<std::string>();
+		// const std::string init_rec_func = model_node["init_rec_func_name"].as<std::string>();
+		// InitPPOCRRecModelFunc init_rec_model = (InitPPOCRRecModelFunc)dlsym(handle, init_rec_func.c_str()); 
+		// PPOCR_Rec* rec_model = init_rec_model(rec_bmodel_file, dev_id);
+		// std::cout << "infer ppocr det and rec model" << std::endl;
+		InferencePPOCRDetRecModelFunc inference_model = (InferencePPOCRDetRecModelFunc)dlsym(handle, infer_func_name.c_str());
+		std::cout << "Success to load model" << std::endl;
+		// int ret = inference_model(det_model, rec_model);
+		ocr_result_list result = inference_model(det_bmodel_file, rec_bmodel_file, input_image, enable_log);
+		std::cout << "Success to inference model" << std::endl;
 	}
 	else {
 		std::cout << "model_type ERROR !" << std::endl;
