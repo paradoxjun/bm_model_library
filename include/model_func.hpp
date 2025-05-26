@@ -66,6 +66,7 @@ int inference_resnet_cls_model(RESNET model, cv::Mat input_image, bool enable_lo
 
 RESNET_NC* init_face_attr_model(std::string bmodel_file, int dev_id);
 cls_model_result inference_face_attr_model(RESNET_NC model, cv::Mat input_image, bool enable_logger);
+cls_model_result inference_call_up_model(RESNET_NC model, cv::Mat input_image, bool enable_logger);
 
 // PPOCR_Detector* init_ppocr_det_model(std::string bmodel_file, int dev_id);
 // PPOCR_Rec* init_ppocr_rec_model(std::string bmodel_file, int dev_id);
