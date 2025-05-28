@@ -11,20 +11,20 @@ models:
     params:
       input_height: 640           #模型推理高度 [int]  根据模型名获得 
       input_width: 640            #模型推理宽度 [int]  根据模型名获得 
-      nms_threshold: 0.7          #NMS阈值 [float]
+      nms_threshold: 0.5          #NMS阈值 [float]
       box_threshold: 0.4          #box得分阈值 [float]
     enable_log: true
   header_det:
     path: "models/det_header_1684x_f16.bmodel"
     init_func_name: "init_yolov8_det_model"
-    function_name: "inference_yolo_person_det_model"
+    function_name: "inference_yolo_header_det_model"
     model_type: yolo_det  # 函数输入输出参数类型相同
     class_names:  ["header"]
     params:
       input_height: 640           #模型推理高度 [int]  根据模型名获得 
       input_width: 640            #模型推理宽度 [int]  根据模型名获得 
-      nms_threshold: 0.6          #NMS阈值 [float]
-      box_threshold: 0.5          #box得分阈值 [float]
+      nms_threshold: 0.5          #NMS阈值 [float]
+      box_threshold: 0.4          #box得分阈值 [float]
     enable_log: true
   face_attr:
     path: "models/cls_face_1684x_f16.bmodel"

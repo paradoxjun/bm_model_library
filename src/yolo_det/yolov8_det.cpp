@@ -478,8 +478,9 @@ void YoloV8_det::NMS(YoloV8BoxVec& dets, float nmsConfidence) {
 }
 
 void YoloV8_det::draw_result(cv::Mat& img, YoloV8BoxVec& result) {
+    std::cout << "draw detected boxes: " << result.size() << std::endl;
     for (int i = 0; i < result.size(); i++) {
-        if(result[i].score < 0.25) continue;
+        // if(result[i].score < 0.25) continue;
         int left, top, right, bottom;
         left = int(result[i].x1);
         top = int(result[i].y1);

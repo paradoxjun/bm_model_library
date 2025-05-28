@@ -38,29 +38,38 @@ object_detect_result_list inference_yolo_person_det_model(YoloV8_det model, cv::
     cv::bmcv::toBMI(input_image, &bmimg);
     batch_imgs.push_back(bmimg);
     ret = model.Detect(batch_imgs, boxes);
-    assert(0 == ret);
-
-    // save result to object_detect_result_list
-    object_detect_result_list result;
-    result.count = boxes[0].size();
-    for (int i = 0; i < boxes[0].size(); i++){
-        result.results[i].cls_id = boxes[0][i].class_id;
-        result.results[i].prop = boxes[0][i].score;
-        result.results[i].box.left = boxes[0][i].x1;
-        result.results[i].box.top = boxes[0][i].y1;
-        result.results[i].box.right = boxes[0][i].x2;
-        result.results[i].box.bottom = boxes[0][i].y2;
+    object_detect_result_list result; // 单张图片推理结果
+    if (ret != 0){
+        std::cout << "inference_yolo_header_det_model failed" << std::endl;
+        result.count = -1;
+        return result;
     }
-
-    if (enable_logger){
-        std::cout << "detect result:" << std::endl;
-        for (int i = 0; i < result.count; i++){
-			std::cout << "result[" << i << "]: " << result.results[i].cls_id << " " << result.results[i].prop << " " << result.results[i].box.left << " " << result.results[i].box.top << " " << result.results[i].box.right << " " << result.results[i].box.bottom << std::endl;
-		}
-        model.draw_result(input_image, boxes[0]);
-        string img_file = "result.jpg";
-        cv::imwrite(img_file, input_image);
-        std::cout << "save result to " << img_file << std::endl;
+    // save result to object_detect_result_list,针对单张图片进行推理
+    if (boxes.size() > 0){
+        result.count = boxes[0].size();
+        for (int i = 0; i < boxes[0].size(); ++i){
+            if (i >= OBJ_NUMB_MAX_SIZE){
+                break;
+            }
+            result.results[i].cls_id = boxes[0][i].class_id;
+            result.results[i].prop = boxes[0][i].score;
+            result.results[i].box.left = boxes[0][i].x1;
+            result.results[i].box.top = boxes[0][i].y1;
+            result.results[i].box.right = boxes[0][i].x2;
+            result.results[i].box.bottom = boxes[0][i].y2;
+        }
+        if (enable_logger){
+            std::cout << "detect result:" << result.count << std::endl;
+            for (int i = 0; i < result.count; ++i){
+                std::cout << "result[" << i << "]: " << result.results[i].cls_id << " " << result.results[i].prop << " " << result.results[i].box.left << " " << result.results[i].box.top << " " << result.results[i].box.right << " " << result.results[i].box.bottom << std::endl;
+            }
+            model.draw_result(input_image, boxes[0]);
+            string img_file = "result.jpg";
+            cv::imwrite(img_file, input_image);
+            std::cout << "save result to " << img_file << std::endl;
+        }
+    }else{
+        result.count = -1;
     }
     return result;
 }
