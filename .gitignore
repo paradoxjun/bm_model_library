@@ -2,5 +2,8 @@ build
 *.jpg
 results
 *.soc
-models
-tests
+models/*.bmodel
+tests/*.jpg
+
+!include/models/
+!src/libbm_model_library.so
