@@ -60,6 +60,7 @@ YoloV8_det* init_yolov8_det_model(std::string bmodel_file, int dev_id, model_inf
 object_detect_result_list inference_yolo_person_det_model(YoloV8_det model, cv::Mat input_image, bool enable_logger);
 object_detect_result_list inference_yolo_header_det_model(YoloV8_det model, cv::Mat input_image, bool enable_logger);
 object_detect_result_list inference_yolo_screen_det_model(YoloV8_det model, cv::Mat input_image, bool enable_logger);
+object_detect_result_list inference_yolo_coco_det_model(YoloV8_det model, cv::Mat input_image, bool enable_logger);
 
 RESNET* init_resnet_cls_model(std::string bmodel_file, int dev_id);
 int inference_resnet_cls_model(RESNET model, cv::Mat input_image, bool enable_logger);
