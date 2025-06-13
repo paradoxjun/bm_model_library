@@ -43,7 +43,7 @@ object_detect_result_list inference_yolo_coco_det_model(YoloV8_det model, cv::Ma
     if (boxes.size() > 0){
         result.count = boxes[0].size();
         for (int i = 0; i < boxes[0].size(); ++i){
-            if (i >= OBJ_NUMB_MAX_SIZE){
+            if (i > OBJ_NUMB_MAX_SIZE){
                 break;
             }
             result.results[i].cls_id = boxes[0][i].class_id;

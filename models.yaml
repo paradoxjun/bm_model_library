@@ -74,3 +74,15 @@ models:
       nms_threshold: 0.6          #NMS阈值 [float]
       box_threshold: 0.4          #box得分阈值 [float]
     enable_log: true
+  # person_track:  # 行人跟踪
+  #   path: "models/yolov5s_v6.1_3output_int8_1b.bmodel"
+  #   init_func_name: "init_yolov8_det_model"
+  #   function_name: "inference_bytetrack_yolov5_det_model"
+  #   model_type: person_track  # 函数输入输出参数类型相同
+  #   class_names: ['person']
+  #   params:
+  #     input_height: 640           #模型推理高度 [int]  根据模型名获得 
+  #     input_width: 640            #模型推理宽度 [int]  根据模型名获得 
+  #     nms_threshold: 0.7          #NMS阈值 [float]
+  #     box_threshold: 0.4          #box得分阈值 [float]
+  #   enable_log: true

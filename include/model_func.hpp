@@ -6,6 +6,9 @@
 #include "models/resnet_nc.hpp"
 #include <opencv2/opencv.hpp>
 
+// #include "bytetrack/bytetrack.h"
+// #include "bytetrack/yolov5.hpp"
+// #include "utils/bm_wrapper.hpp"
 
 #ifdef __cplusplus
 extern "C" {
@@ -73,6 +76,9 @@ cls_model_result inference_call_up_model(RESNET_NC model, cv::Mat input_image, b
 // PPOCR_Rec* init_ppocr_rec_model(std::string bmodel_file, int dev_id);
 // int inference_ppocr_det_rec_model(PPOCR_Detector ppocr_det, PPOCR_Rec ppocr_rec);
 ocr_result_list inference_ppocr_det_rec_model(std::string bmodel_det, std::string bmodel_rec, cv::Mat input_image, bool enable_logger);
+
+// STracks inference_bytetrack_yolov5_det_model(YoloV5 yolov5, BYTETracker bytetrack, bm_image img, bool enable_logger);
+
 #ifdef __cplusplus
 }
 #endif

@@ -11,6 +11,8 @@ include_directories(
     ${CMAKE_SOURCE_DIR}/include/models
     ${CMAKE_SOURCE_DIR}/include/ppocr
     ${CMAKE_SOURCE_DIR}/include/utils
+    ${CMAKE_SOURCE_DIR}/include/bytetrack
+    ${CMAKE_SOURCE_DIR}/include/opencv4
 )
 
 # 获取所有子目录的头文件到HEADER变量中
@@ -19,12 +21,14 @@ file(GLOB_RECURSE HEADER
     ${CMAKE_SOURCE_DIR}/include/models/*.h*
     ${CMAKE_SOURCE_DIR}/include/ppocr/*.h*
     ${CMAKE_SOURCE_DIR}/include/utils/*.h*
+    ${CMAKE_SOURCE_DIR}/include/bytetrack/*.h*
     )
 file(GLOB_RECURSE SOURCE 
     ${CMAKE_SOURCE_DIR}/src/yolo_det/*.c*
     ${CMAKE_SOURCE_DIR}/src/classify/*.c*
     ${CMAKE_SOURCE_DIR}/src/utils/*.c*
     ${CMAKE_SOURCE_DIR}/src/ppocr/*.c*
+    ${CMAKE_SOURCE_DIR}/src/bytetrack/*.c*
     )
 message("HEADER: ${HEADER}")
 message("SOURCE: ${SOURCE}")
@@ -39,7 +43,7 @@ add_library(
 
 set(BM_LIBS bmlib bmrt bmcv yuv)
 set(JPU_LIBS bmjpuapi bmjpulite)
-set(OPENCV_LIBS opencv_imgproc opencv_core opencv_highgui opencv_imgcodecs opencv_videoio)
+set(OPENCV_LIBS opencv_imgproc opencv_core opencv_highgui opencv_imgcodecs opencv_videoio opencv_video)
 
 target_link_libraries(
     bm_model_library

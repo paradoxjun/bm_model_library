@@ -39,11 +39,13 @@ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -march=armv8-a")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=armv8-a -std=c++11 -O2")
 set(BM_LIBS bmlib bmrt bmcv yuv)
 set(JPU_LIBS bmjpuapi bmjpulite)
-set(OPENCV_LIBS opencv_imgproc opencv_core opencv_highgui opencv_imgcodecs opencv_videoio)
+set(OPENCV_LIBS opencv_imgproc opencv_core opencv_highgui opencv_imgcodecs opencv_videoio opencv_video)
 set(YAML_LIBS yaml-cpp)
 include_directories("${SDK}/include/")
 include_directories("${SDK}/include/opencv4")
 include_directories("${SDK}/include/yaml-cpp")
+include_directories("${SDK}/include/bytetrack")
+include_directories("${SDK}/include/utils")
 link_directories("${SDK}/lib/")
 
 message("SDK: " ${SDK})
@@ -53,8 +55,11 @@ add_subdirectory(
     ${CMAKE_SOURCE_DIR}/src
 )
 
-aux_source_directory(. SRC_FILES)
-add_executable(yolov8_bmcv.soc ${SRC_FILES})
+# aux_source_directory(. SRC_FILES)
+# message("SRC_FILES: " ${SRC_FILES})
+# add_executable(yolov8_bmcv.soc ${SRC_FILES})
+# add_executable(yolov8_bmcv.soc test_video_track.cpp)
+add_executable(yolov8_bmcv.soc main.cpp)
 target_link_libraries(yolov8_bmcv.soc 
     bm_model_library
     dl
