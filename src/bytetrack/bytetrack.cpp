@@ -7,7 +7,6 @@
 //
 //===----------------------------------------------------------------------===//
 #include "bytetrack.h"
-#include "model_func.hpp"
 #include <fstream>
 
 BYTETracker::BYTETracker(const bytetrack_params& params) {

@@ -12,7 +12,7 @@
 
 #include "lapjv.h"
 #include "strack.h"
-#include "../model_func.hpp"
+#include "../model_params.hpp"
 
 struct bytetrack_params {
   // detector:
