@@ -4,6 +4,7 @@ results
 *.soc
 models
 tests/*.jpg
+tests/*.mp4
 
 !include/models/
 !src/libbm_model_library.so

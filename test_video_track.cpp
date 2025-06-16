@@ -20,19 +20,19 @@
 #include <fstream>
 #include <regex>
 
-#include "include/bytetrack/bytetrack.h"
 #include "include/bytetrack/draw_utils.hpp"
 #include "include/utils/ff_decode.hpp"
 #include "include/utils/json.hpp"
-// #include "yolov5.hpp"
 #include "include/model_func.hpp"
 using json = nlohmann::json;
 
 // yolo det
 typedef YoloV8_det* (*InitYOLODetModelFunc)(std::string bmodel_file, int dev_id, model_inference_params params, std::vector<std::string> model_class_names);
 typedef object_detect_result_list (*InferenceYOLODetModelFunc)(YoloV8_det* model, cv::Mat input_image, bool enable_logger);
-// typedef STracks (*InferencePersonByteTrackModelFunc)(YoloV5 yolov5, BYTETracker bytetrack, bm_image img, bool enable_logger);
 
+// bytetrack
+typedef BYTETracker* (*InitBYTETrackModelFunc)(bytetrack_params track_params);
+typedef STracks (*InferenceBYTETrackModelFunc)(BYTETracker* bytetrack, object_detect_result_list result, bool enable_logger);
 
 std::vector<std::string> stringSplit(const std::string& str, char delim) {
   std::string s;
@@ -103,12 +103,16 @@ static YAML::Node ReadYamlFile(const char* yaml_path) {
 	return model_node;
 }
 
-
-int main() {
-  std::cout.setf(std::ios::fixed);
+int main(int argc, char** argv) {
+	if (argc != 2) {
+		printf("%s <video_path>\n", argv[0]);
+		return -1;
+	}
+	int ret = 0;
+	int dev_id = 0;
+	std::string input = argv[1];  //
   // get params
-  int ret = 0;
-  int dev_id = 0;
+  // std::string input = "tests/dsz1206.mp4";
   // 打开动态库
 	dlerror();
 	void* handle = NULL;
@@ -152,44 +156,33 @@ int main() {
   }
   // initialize net
   YoloV8_det* model = init_model(bmodel_detector, dev_id, params, class_names);
-  // object_detect_result_list result = inference_model(model, input_image, enable_log);
 
   /*-------------------------------------------
                   Person Track Function
   -------------------------------------------*/
-	// const std::string init_func_name = model_node["init_func_name"].as<std::string>();
-	// const std::string infer_func_name = model_node["function_name"].as<std::string>();
-	// const std::string bmodel_detector = model_node["path"].as<std::string>();
-	// const std::string enable_log_str = model_node["enable_log"].as<std::string>();
-	// bool enable_log = (enable_log_str == "true" || enable_log_str == "True");
-
-  // get params
-  std::string input = "tests/dsz1206.mp4";
-  // std::string input = "tests/jnt1206";
-  // std::string classnames = "src/bytetrack/coco.names";
-  // std::string config = "src/bytetrack/bytetrack.yaml";
-
+const char* track_model_name = "person_track";
+	YAML::Node track_model_node = config[track_model_name];
+	if (!track_model_node) {
+		std::cerr << "Unknown model_name: " << track_model_name << std::endl;
+		throw std::invalid_argument("Unknown model_name: " + std::string(track_model_name));
+	}
+  const std::string track_init_func_name = track_model_node["init_func_name"].as<std::string>();
+	const std::string track_infer_func_name = track_model_node["function_name"].as<std::string>();
+	const std::string track_enable_log_str = track_model_node["enable_log"].as<std::string>();
+	bool track_enable_log = (track_enable_log_str == "true" || track_enable_log_str == "True");
+  InitBYTETrackModelFunc track_init_model = (InitBYTETrackModelFunc)dlsym(handle, track_init_func_name.c_str());
+  InferenceBYTETrackModelFunc track_inference_model = (InferenceBYTETrackModelFunc)dlsym(handle, track_infer_func_name.c_str());
   bytetrack_params track_params;
-  // track_params.conf_thresh = 0.7;
-  // track_params.nms_thresh = 0.4;
-  track_params.track_thresh = 0.7;
-  track_params.match_thresh = 0.8;
-  track_params.min_box_area = 10;
-  track_params.track_buffer = 30;
-  track_params.frame_rate = 30;
+  track_params.track_thresh = track_model_node["params"]["track_thresh"].as<float>();
+  track_params.match_thresh = track_model_node["params"]["match_thresh"].as<float>();
+  track_params.min_box_area = track_model_node["params"]["min_box_area"].as<int>();
+  track_params.track_buffer = track_model_node["params"]["track_buffer"].as<int>();
+  track_params.frame_rate = track_model_node["params"]["frame_rate"].as<int>();
 
-  // check params
-  struct stat info;
-  if (stat(bmodel_detector.c_str(), &info) != 0) {
-    std::cout << "Cannot find valid detector model file." << std::endl;
-    exit(1);
-  }
-  if (stat(input.c_str(), &info) != 0) {
-    std::cout << "Cannot find input path." << std::endl;
-    exit(1);
-  }
-
-  // InferencePersonByteTrackModelFunc inference_model = (InferencePersonByteTrackModelFunc)dlsym(handle, infer_func_name.c_str());
+  // initialize net
+  // BYTETracker bytetrack(track_params);
+  BYTETracker* bytetrack = track_init_model(track_params);
+  std::cout << "bytetrack init done" << std::endl;
 
   // creat handle
   BMNNHandlePtr bm_handle = std::make_shared<BMNNHandle>(dev_id);
@@ -200,36 +193,12 @@ int main() {
   // std::shared_ptr<BMNNContext> bm_ctx_detector =
   //     std::make_shared<BMNNContext>(bm_handle, bmodel_detector.c_str());
 
-  // initialize net
-  BYTETracker bytetrack(track_params);
-  std::cout << "bytetrack init done" << std::endl;
-
-  // get batch_size
-  // creat save path
-  if (access("results", 0) != F_OK) mkdir("results", S_IRWXU);
-  if (access("results/images", 0) != F_OK) mkdir("results/images", S_IRWXU);
-  if (access("results/video", 0) != F_OK) mkdir("results/video", S_IRWXU);
-
-  // initialize data buffer.
-  std::vector<bm_image> batch_imgs;
-  int id = 0;
   //  test images
-  std::vector<std::string> image_paths;
   VideoDecFFM decoder;
-  std::string save_image_path;
-  auto stringBuffer = stringSplit(input, '/');
-  auto bmodel_detector_name_buffer = stringSplit(bmodel_detector, '/');
-  auto bmodel_detector_name =
-      bmodel_detector_name_buffer[bmodel_detector_name_buffer.size() - 1];
-  if (info.st_mode & S_IFDIR) {
-    std::vector<std::string> correct_postfixes = {"jpg", "png"};
-    getAllFiles(input, image_paths, correct_postfixes);
-    sort(image_paths.begin(), image_paths.end());
-    save_image_path = "results/images/";
-  } else {
-    decoder.openDec(&h, input.c_str());
-    save_image_path = "results/video/";
-  }
+  decoder.openDec(&h, input.c_str());
+  std::string save_image_path = "results/video/";
+  if (access("results", 0) != F_OK) mkdir("results", S_IRWXU);
+  if (access("results/video", 0) != F_OK) mkdir("results/video", S_IRWXU);
 
   bool end_flag = false;
   int ind = 0;
@@ -242,9 +211,9 @@ int main() {
     }
     cv::Mat cv_image;
     cv::bmcv::toMAT(img, cv_image);
-    object_detect_result_list result = inference_model(model, cv_image, false);
-    STracks output_stracks;
-    bytetrack.update(output_stracks, result);
+    object_detect_result_list result = inference_model(model, cv_image, enable_log);
+    STracks output_stracks = track_inference_model(bytetrack, result, track_enable_log);
+    // bytetrack.update(output_stracks, result);
     for (auto& track_box : output_stracks) {
       int track_id = track_box->track_id;
       int box_x1 = track_box->tlwh[0];
