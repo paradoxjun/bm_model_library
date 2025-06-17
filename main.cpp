@@ -18,8 +18,8 @@ typedef RESNET* (*InitResNetClsModelFunc)(std::string bmodel_file, int dev_id);
 typedef int (*InferenceResNetClsModelFunc)(RESNET* model, cv::Mat input_image, bool enable_logger);
 
 // face_attr
-typedef RESNET_NC* (*InitFaceAttrModelFunc)(std::string bmodel_file, int dev_id);
-typedef cls_model_result (*InferenceFaceAttrModelFunc)(RESNET_NC* model, cv::Mat input_image, bool enable_logger);
+typedef RESNET_NC* (*InitMultiClassModelFunc)(std::string bmodel_file, int dev_id);
+typedef cls_model_result (*InferenceMultiClassModelFunc)(RESNET_NC* model, cv::Mat input_image, bool enable_logger);
 
 // ppocr
 // typedef PPOCR_Detector* (*InitPPOCRDetModelFunc)(std::string bmodel_file, int dev_id);
@@ -124,42 +124,16 @@ int main(int argc, char** argv) {
 		std::cout << "Success to inference model" << std::endl;
 		delete model;
 		std::cout << "Success to destroy model" << std::endl;
-	}else if (model_type == "face_attr") { // 多分类模型
-		// std::cout << "Start to inference header det model" << std::endl;
-		// InitYOLODetModelFunc init_det_model = (InitYOLODetModelFunc)dlsym(handle, "init_yolov8_det_model");
-		// InferenceYOLODetModelFunc inference_det_model = (InferenceYOLODetModelFunc)dlsym(handle, "inference_yolo_person_det_model");
-		// const std::string det_bmodel_file = "models/det_header_1684x_f16.bmodel";
-		// model_inference_params params;
-		// params.input_height = 640;
-		// params.input_width = 640;
-		// params.nms_threshold = 0.6;
-		// params.box_threshold = 0.5;
-		// std::vector<std::string> class_names;
-		// class_names.push_back("header");
-		// YoloV8_det* det_model = init_det_model(det_bmodel_file, dev_id, params, class_names);
-		// object_detect_result_list det_result = inference_det_model(det_model, input_image, enable_log);
-		// std::cout << "det result size: " << det_result.count << std::endl;
+	}else if (model_type == "multi_class") { // 多分类模型
 		std::cout << "Start to inference classification model" << std::endl;
-		InitFaceAttrModelFunc init_model = (InitFaceAttrModelFunc)dlsym(handle, init_func_name.c_str());
-		InferenceFaceAttrModelFunc inference_model = (InferenceFaceAttrModelFunc)dlsym(handle, infer_func_name.c_str());
+		InitMultiClassModelFunc init_model = (InitMultiClassModelFunc)dlsym(handle, init_func_name.c_str());
+		InferenceMultiClassModelFunc inference_model = (InferenceMultiClassModelFunc)dlsym(handle, infer_func_name.c_str());
 		RESNET_NC* model = init_model(bmodel_file, dev_id);
-		// std::cout << "Success to inference face attr model" << std::endl;
-		// for (int i=0;i<det_result.count;i++){
-		// 	int cls_id = det_result.results[i].cls_id;
-		// 	float score = det_result.results[i].prop;
-		// 	int left = det_result.results[i].box.left;
-		// 	int top = det_result.results[i].box.top;
-		// 	int right = det_result.results[i].box.right;
-		// 	int bottom = det_result.results[i].box.bottom;
-		// 	cv::Mat img_crop = input_image(cv::Rect(left, top, right - left, bottom - top));
-		// 	cls_model_result cls_result = inference_model(model, img_crop, enable_log);
-		// 	std::cout << "模型输出类别: " << cls_result.num_class << std::endl;
-		// 	for (int i=0; i < cls_result.num_class; i++){
-		// 		std::cout << "类别: " << i << " 输出: " << cls_result.cls_output[i] << std::endl;
-		// 	}
-		// }
-		// delete det_model;
 		cls_model_result cls_result = inference_model(model, input_image, enable_log);
+		std::cout << "模型输出类别: " << cls_result.num_class << std::endl;
+		for (int i=0; i < cls_result.num_class; i++){
+			std::cout << "类别: " << i << " 输出: " << cls_result.cls_output[i] << std::endl;
+		}
 		delete model;
 		std::cout << "Success to destroy model" << std::endl;
 	}else if (model_type == "ppocr") {

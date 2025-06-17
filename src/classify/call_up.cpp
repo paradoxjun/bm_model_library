@@ -23,9 +23,10 @@ extern "C" {          // 确保函数名称不会在导出时被修饰
 
 std::vector<std::string> call_up_class_names = {
     "call_up",
+    "smoke",
 };
 
-// RESNET_NC* init_face_attr_model(string bmodel_file, int dev_id){
+// RESNET_NC* init_multi_class_model(string bmodel_file, int dev_id){
 //     // creat handle
 //     BMNNHandlePtr handle = make_shared<BMNNHandle>(dev_id);
 //     cout << "set device id: "  << dev_id << endl;
@@ -36,7 +37,7 @@ std::vector<std::string> call_up_class_names = {
 //     return new RESNET_NC(bm_ctx);
 // }
 
-cls_model_result inference_call_up_model(RESNET_NC model, cv::Mat input_image, bool enable_logger=false){
+cls_model_result inference_callup_smoke_model(RESNET_NC model, cv::Mat input_image, bool enable_logger=false){
     // single image inference
     // int batch_size = model.batch_size();
     cls_model_result results;

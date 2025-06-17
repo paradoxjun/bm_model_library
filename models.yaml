@@ -28,17 +28,18 @@ models:
     enable_log: true
   face_attr:
     path: "models/cls_face_1684x_f16.bmodel"
-    init_func_name: "init_face_attr_model"
+    init_func_name: "init_multi_class_model"
     function_name: "inference_face_attr_model"
-    model_type: face_attr
+    model_type: multi_class
     # class_names:  ["hat", "glass", "mask"]
     enable_log: true
   call_up:
-    path: "models/cls_callup_1684x_F16.bmodel"
-    init_func_name: "init_face_attr_model"
-    function_name: "inference_call_up_model"
-    model_type: face_attr
-    # class_names:  ["call_up"]
+    # path: "models/cls_callup_1684x_F16.bmodel"
+    path: "models/callup_smoke_1684x_F16.bmodel"
+    init_func_name: "init_multi_class_model"
+    function_name: "inference_callup_smoke_model"
+    model_type: multi_class
+    # class_names:  ["call_up", "smoke"]
     enable_log: true
   screen_det:  # 屏幕检测，0表示手机屏幕，1表示电脑屏幕
     path: "models/det_screen_1684x_F16.bmodel"

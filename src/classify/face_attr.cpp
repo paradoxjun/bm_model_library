@@ -27,7 +27,7 @@ std::vector<std::string> face_attr_class_names = {
     "mask"
 };
 
-RESNET_NC* init_face_attr_model(string bmodel_file, int dev_id){
+RESNET_NC* init_multi_class_model(string bmodel_file, int dev_id){
     // creat handle
     BMNNHandlePtr handle = make_shared<BMNNHandle>(dev_id);
     cout << "set device id: "  << dev_id << endl;
