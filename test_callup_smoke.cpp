@@ -122,6 +122,21 @@ int main(int argc, char** argv) {
 	const std::string cls_enable_log_str = cls_model_node["enable_log"].as<std::string>();
 	bool cls_enable_log = (cls_enable_log_str == "true" || cls_enable_log_str == "True");
 
+	std::vector<std::string> cls_class_names;
+	for (auto cls_class_node : cls_model_node["class_names"]) {
+		std::string cls_class_name = cls_class_node.as<std::string>();
+		cls_class_names.push_back(cls_class_name);
+	}
+	std::vector<std::vector<std::string>> class_values;
+    YAML::Node face_attr_node = cls_model_node["class_values"];  // Fixed fs -> config
+    for (YAML::const_iterator it = face_attr_node.begin(); it != face_attr_node.end(); ++it) {
+        std::vector<std::string> values;
+        for (YAML::const_iterator jt = it->begin(); jt != it->end(); ++jt) {
+            values.push_back(jt->as<std::string>());
+        }
+        class_values.push_back(values);
+    }
+
 	InitMultiClassModelFunc cls_init_model = (InitMultiClassModelFunc)dlsym(handle, cls_init_func_name.c_str());
 	InferenceMultiClassModelFunc cls_inference_model = (InferenceMultiClassModelFunc)dlsym(handle, cls_infer_func_name.c_str());
 	RESNET_NC* cls_model = cls_init_model(cls_bmodel_file, dev_id);
@@ -137,7 +152,7 @@ int main(int argc, char** argv) {
 		cls_model_result cls_result = cls_inference_model(cls_model, img_crop, enable_log);
 		std::cout << "模型输出类别: " << cls_result.num_class << std::endl;
 		for (int i=0; i < cls_result.num_class; i++){
-			std::cout << "类别: " << i << " 输出: " << cls_result.cls_output[i] << std::endl;
+			std::cout << "类别: " << cls_class_names[i] << " 输出: " << class_values[i][cls_result.cls_output[i]] << std::endl;
 		}
 	}
 	delete cls_model;

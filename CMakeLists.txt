@@ -60,8 +60,9 @@ add_subdirectory(
 # add_executable(yolov8_bmcv.soc ${SRC_FILES})
 # add_executable(yolov8_bmcv.soc test_video_track.cpp)
 # add_executable(yolov8_bmcv.soc test_face_attr.cpp)
-# add_executable(yolov8_bmcv.soc test_callup_smoke.cpp)
-add_executable(yolov8_bmcv.soc main.cpp)
+add_executable(yolov8_bmcv.soc test_callup_smoke.cpp)
+# add_executable(yolov8_bmcv.soc test_person_wander.cpp)
+# add_executable(yolov8_bmcv.soc main.cpp)
 target_link_libraries(yolov8_bmcv.soc 
     bm_model_library
     dl

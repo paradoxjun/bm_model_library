@@ -5,6 +5,7 @@ results
 models
 tests/*.jpg
 tests/*.mp4
+tests/*.zip
 
 !include/models/
 !src/libbm_model_library.so

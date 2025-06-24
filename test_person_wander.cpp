@@ -7,7 +7,7 @@
 //
 //===----------------------------------------------------------------------===//
 
-// 基于yolov8-person det 算法和bytetrack跟踪算法，实现视频的行人多目标跟踪，视频中每个人的track_id和box位置
+// func: 基于Bytetrack算法的返回结果，测试视频中是否有某个人存在异常徘徊的行为，返回track_id
 #include <iostream>
 #include <dlfcn.h>
 #include "yaml-cpp/yaml.h"
@@ -26,6 +26,33 @@
 #include "include/model_func.hpp"
 using json = nlohmann::json;
 
+#include <vector>
+#include <cmath>
+#include <chrono>
+ 
+struct Point {
+    float x;  // x坐标
+    float y;  // y坐标
+    std::chrono::system_clock::time_point timestamp; // 时间戳
+};
+ 
+class Pedestrian {
+public:
+    int id;  // 行人ID
+    std::vector<Point> trajectory;  // 轨迹点集合
+ 
+    Pedestrian(int id) : id(id) {}
+ 
+    // 添加轨迹点
+    void addPoint(float x, float y) {
+        Point point;
+        point.x = x;
+        point.y = y;
+        point.timestamp = std::chrono::system_clock::now();
+        trajectory.push_back(point);
+    }
+};
+
 // yolo det
 typedef YoloV8_det* (*InitYOLODetModelFunc)(std::string bmodel_file, int dev_id, model_inference_params params, std::vector<std::string> model_class_names);
 typedef object_detect_result_list (*InferenceYOLODetModelFunc)(YoloV8_det* model, cv::Mat input_image, bool enable_logger);
@@ -34,6 +61,63 @@ typedef object_detect_result_list (*InferenceYOLODetModelFunc)(YoloV8_det* model
 typedef BYTETracker* (*InitBYTETrackModelFunc)(bytetrack_params track_params);
 typedef STracks (*InferenceBYTETrackModelFunc)(BYTETracker* bytetrack, object_detect_result_list result, bool enable_logger);
 
+// 计算两个点之间的欧氏距离
+static float calculateDistance(const Point& p1, const Point& p2) {
+    float dx = p1.x - p2.x;
+    float dy = p1.y - p2.y;
+    return std::sqrt(dx * dx + dy * dy);
+}
+
+// 计算单位时间内(帧数)的移动距离
+static float calculateMovementDistance(const Pedestrian& pedestrian, float timeWindowSeconds) {
+    if (pedestrian.trajectory.size() < 2) {
+        return 0.0f; // 轨迹点不足，无法计算
+    }
+
+    float totalDistance = 0.0f;
+    int count = 0;
+
+    // 遍历轨迹点，统计时间窗口内的移动距离
+    for (size_t i = 1; i < pedestrian.trajectory.size(); ++i) {
+        auto duration = std::chrono::duration_cast<std::chrono::seconds>(
+            pedestrian.trajectory[i].timestamp - pedestrian.trajectory[i - 1].timestamp
+        ).count();
+
+        if (duration <= timeWindowSeconds) {
+            totalDistance += calculateDistance(pedestrian.trajectory[i], pedestrian.trajectory[i - 1]);
+            count++;
+        } else {
+            break; // 超出时间窗口，停止统计
+        }
+    }
+
+    return (count > 0) ? totalDistance / count : 0.0f; // 返回平均移动距离
+}
+
+// 判断轨迹是否在某个区域内重复
+static bool isTrajectoryRepeating(const Pedestrian& pedestrian, float gridSize, int repeatThreshold) {
+    if (pedestrian.trajectory.size() < 3) {
+        return false; // 轨迹点不足，无法判断
+    }
+
+    // 将区域划分为网格，统计每个网格的访问次数
+    // std::unordered_map<std::pair<int, int>, int> gridCounts;
+    std::map<std::pair<int, int>, int> gridCounts;
+    for (const auto& point : pedestrian.trajectory) {
+        int gridX = static_cast<int>(point.x / gridSize);
+        int gridY = static_cast<int>(point.y / gridSize);
+        gridCounts[{gridX, gridY}]++;
+    }
+
+    // 检查是否有网格的访问次数超过阈值
+    for (const auto& entry : gridCounts) {
+        if (entry.second >= repeatThreshold) {
+            return true;
+        }
+    }
+
+    return false;
+}
 
 static int loadSo(const char* soPath, void*& handle) {
 	handle = dlopen(soPath, RTLD_LAZY);
@@ -115,7 +199,7 @@ int main(int argc, char** argv) {
   /*-------------------------------------------
                   Person Track Function
   -------------------------------------------*/
-const char* track_model_name = "person_track";
+  const char* track_model_name = "person_track";
 	YAML::Node track_model_node = config[track_model_name];
 	if (!track_model_node) {
 		std::cerr << "Unknown model_name: " << track_model_name << std::endl;
@@ -146,13 +230,16 @@ const char* track_model_name = "person_track";
   //  test images
   VideoDecFFM decoder;
   decoder.openDec(&h, input.c_str());
-  std::string save_image_path = "results/video/";
-  if (access("results", 0) != F_OK) mkdir("results", S_IRWXU);
-  if (access("results/video", 0) != F_OK) mkdir("results/video", S_IRWXU);
+  // std::string save_image_path = "results/video/";
+  // if (access("results", 0) != F_OK) mkdir("results", S_IRWXU);
+  // if (access("results/video", 0) != F_OK) mkdir("results/video", S_IRWXU);
 
   bool end_flag = false;
   int ind = 0;
-  cv::Scalar color = cv::Scalar(0, 255, 0);
+  // cv::Scalar color = cv::Scalar(0, 255, 0);
+
+  std::map<int, Pedestrian> pedestrians; // 保存所有行人的轨迹信息
+
   while (!end_flag) {
     bm_image* img;
     img = decoder.grab();
@@ -165,23 +252,50 @@ const char* track_model_name = "person_track";
     STracks output_stracks = track_inference_model(bytetrack, result, track_enable_log);
     for (auto& track_box : output_stracks) {
       int track_id = track_box->track_id;
+      // 检查是否已存在该行人
+      if (pedestrians.find(track_id) == pedestrians.end()) {
+          // pedestrians[track_id] = Pedestrian(track_id); // 创建新行人
+          pedestrians.emplace(track_id, Pedestrian(track_id));
+      }
       int box_x1 = track_box->tlwh[0];
       int box_y1 = track_box->tlwh[1];
       int box_w = track_box->tlwh[2];
       int box_h = track_box->tlwh[3];
       int frame_id = track_box->frame_id;
       int class_id = track_box->class_id;
-      std::string text = "track_id:" + std::to_string(track_id);
+      // std::string text = "track_id:" + std::to_string(track_id);
       std::cout << "frame_id:" << frame_id << " track_id:" << track_id << " class_id:" << class_id << " box:" << box_x1 << "," << box_y1 << "," << box_w << "," << box_h << std::endl;
-      cv::rectangle(cv_image, cv::Point(box_x1,box_y1),cv::Point(box_x1+box_w,box_y1+box_h), color, 2);
-      cv::putText(cv_image, text, cv::Point(box_x1, box_y1-10), cv::FONT_HERSHEY_SIMPLEX, 2, cv::Scalar(0, 255, 0));
+      // cv::rectangle(cv_image, cv::Point(box_x1,box_y1),cv::Point(box_x1+box_w,box_y1+box_h), color, 2);
+      // cv::putText(cv_image, text, cv::Point(box_x1, box_y1-10), cv::FONT_HERSHEY_SIMPLEX, 2, cv::Scalar(0, 255, 0));
+      int box_x2 = box_x1 + box_w;
+      int box_y2 = box_y1 + box_h;
+      int box_ctr_x = float((box_x1 + box_x2) / 2);
+      int box_ctr_y = float((box_y1 + box_y2) / 2);
+      // pedestrians[track_id].addPoint(box_ctr_x, box_ctr_y);
+      pedestrians.at(track_id).addPoint(box_ctr_x, box_ctr_y);
     }
     ++ind;
     std::cout << "track_nums: " << output_stracks.size() << std::endl;
-    std::string filename = save_image_path + "frame_" + std::to_string(ind) + ".jpg";
-    cv::imwrite(filename, cv_image);
+    // std::string filename = save_image_path + "frame_" + std::to_string(ind) + ".jpg";
+    // cv::imwrite(filename, cv_image);
+    // 释放img
+    bm_image_destroy(*img);
+    if (ind == 1000) { // 测试1000帧后结束
+      std::cout << "stop the track: " << ind << std::endl;
+      break;
+    }
+
   }
-  
+  for (const auto& pair : pedestrians) {
+    const Pedestrian& pedestrian = pair.second;
+    // 计算单位时间内的移动距离（时间窗口为5秒）
+    float avgDistance = calculateMovementDistance(pedestrian, 5.0f);
+    std::cout << "Person " << pair.first << " Average movement distance in 5 seconds: " << avgDistance << std::endl;
+
+    // 检测轨迹重复（网格大小为2.0，重复阈值为3）
+    bool isRepeating = isTrajectoryRepeating(pedestrian, 2.0f, 3);
+    std::cout << "Person " << pair.first <<" is trajectory repeating? " << (isRepeating ? "Yes" : "No") << std::endl;
+  }
   if (handle != nullptr) {
 		dlclose(handle); 
 		handle = nullptr;
