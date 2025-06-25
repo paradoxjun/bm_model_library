@@ -33,7 +33,7 @@ using json = nlohmann::json;
 struct Point {
     float x;  // x坐标
     float y;  // y坐标
-    std::chrono::system_clock::time_point timestamp; // 时间戳
+    // std::chrono::system_clock::time_point timestamp; // 时间戳
 };
  
 class Pedestrian {
@@ -48,7 +48,7 @@ public:
         Point point;
         point.x = x;
         point.y = y;
-        point.timestamp = std::chrono::system_clock::now();
+        // point.timestamp = std::chrono::system_clock::now();
         trajectory.push_back(point);
     }
 };
@@ -69,25 +69,23 @@ static float calculateDistance(const Point& p1, const Point& p2) {
 }
 
 // 计算单位时间内(帧数)的移动距离
-static float calculateMovementDistance(const Pedestrian& pedestrian, float timeWindowSeconds) {
-    if (pedestrian.trajectory.size() < 2) {
+static float calculateMovementDistance(const Pedestrian& pedestrian, int timeWindowFrames) {
+    if (pedestrian.trajectory.size() < timeWindowFrames) {
+        std::cout << "轨迹点不足:" << timeWindowFrames <<std::endl;
         return 0.0f; // 轨迹点不足，无法计算
     }
-
+    int all_frames_num = pedestrian.trajectory.size();
     float totalDistance = 0.0f;
     int count = 0;
 
     // 遍历轨迹点，统计时间窗口内的移动距离
-    for (size_t i = 1; i < pedestrian.trajectory.size(); ++i) {
-        auto duration = std::chrono::duration_cast<std::chrono::seconds>(
-            pedestrian.trajectory[i].timestamp - pedestrian.trajectory[i - 1].timestamp
-        ).count();
-
-        if (duration <= timeWindowSeconds) {
-            totalDistance += calculateDistance(pedestrian.trajectory[i], pedestrian.trajectory[i - 1]);
-            count++;
-        } else {
-            break; // 超出时间窗口，停止统计
+    for (int i = 0; i < pedestrian.trajectory.size(); ++i) {
+        if (i < all_frames_num - timeWindowFrames){
+          continue; // 跳过前timeWindowFrames帧
+        }
+        else{
+          totalDistance += calculateDistance(pedestrian.trajectory[i], pedestrian.trajectory[i - 1]);
+          count++;
         }
     }
 
@@ -96,7 +94,7 @@ static float calculateMovementDistance(const Pedestrian& pedestrian, float timeW
 
 // 判断轨迹是否在某个区域内重复
 static bool isTrajectoryRepeating(const Pedestrian& pedestrian, float gridSize, int repeatThreshold) {
-    if (pedestrian.trajectory.size() < 3) {
+    if (pedestrian.trajectory.size() < 30) {
         return false; // 轨迹点不足，无法判断
     }
 
@@ -280,22 +278,26 @@ int main(int argc, char** argv) {
     // cv::imwrite(filename, cv_image);
     // 释放img
     bm_image_destroy(*img);
-    if (ind == 1000) { // 测试1000帧后结束
+    if (ind == 500) { // 测试1000帧后结束
       std::cout << "stop the track: " << ind << std::endl;
       break;
     }
+    // 每当pedestrians内某个track_id的长度为30时，调用计算单位时间内的移动距离轨迹函数和重复检测函数
+
+    for (const auto& pair : pedestrians) {
+      const Pedestrian& pedestrian = pair.second;
+      if (pedestrian.trajectory.size() >= 30){
+        float avgDistance = calculateMovementDistance(pedestrian, 30);
+        std::cout << "Person " << pair.first << " Average movement distance in 30 frames: " << avgDistance << std::endl;
+        // 检测轨迹重复（网格大小为2.0，重复阈值为3）
+        bool isRepeating = isTrajectoryRepeating(pedestrian, 2.0f, 3);
+        std::cout << "Person " << pair.first <<" is trajectory repeating? " << (isRepeating ? "Yes" : "No") << std::endl;
+      }
+    }
 
   }
-  for (const auto& pair : pedestrians) {
-    const Pedestrian& pedestrian = pair.second;
-    // 计算单位时间内的移动距离（时间窗口为5秒）
-    float avgDistance = calculateMovementDistance(pedestrian, 5.0f);
-    std::cout << "Person " << pair.first << " Average movement distance in 5 seconds: " << avgDistance << std::endl;
-
-    // 检测轨迹重复（网格大小为2.0，重复阈值为3）
-    bool isRepeating = isTrajectoryRepeating(pedestrian, 2.0f, 3);
-    std::cout << "Person " << pair.first <<" is trajectory repeating? " << (isRepeating ? "Yes" : "No") << std::endl;
-  }
+  // pedestrians 释放资源
+  pedestrians.clear();
   if (handle != nullptr) {
 		dlclose(handle); 
 		handle = nullptr;
