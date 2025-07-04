@@ -9,3 +9,7 @@ tests/*.zip
 
 !include/models/
 !src/libbm_model_library.so
+
+.vscode/
+run.sh
+test_data

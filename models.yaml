@@ -93,3 +93,51 @@ models:
       track_buffer: 30
       frame_rate: 30
     enable_log: false
+  det_hand:
+    path: "models/det_money_yolov8s_x1.0_250516_fp16_1b.bmodel"
+    init_func_name: "init_yolov8_det_model"
+    function_name: "inference_yolo_hand_det_model"
+    model_type: yolo_det
+    class_names:  ["hand"]
+    params:
+      input_height: 640           #模型推理高度 [int]  根据模型名获得 
+      input_width: 640            #模型推理宽度 [int]  根据模型名获得 
+      nms_threshold: 0.5          #NMS阈值 [float]
+      box_threshold: 0.4          #box得分阈值 [float]
+    enable_log: true
+  det_money:
+    path: "models/det_money_yolov8s_x1.0_250516_fp16_1b.bmodel"
+    init_func_name: "init_yolov8_det_model"
+    function_name: "inference_yolo_money_det_model"
+    model_type: yolo_det
+    class_names:  ["money"]
+    params:
+      input_height: 640           #模型推理高度 [int]  根据模型名获得 
+      input_width: 640            #模型推理宽度 [int]  根据模型名获得 
+      nms_threshold: 0.5          #NMS阈值 [float]
+      box_threshold: 0.4          #box得分阈值 [float]
+    enable_log: true
+  det_gzwp_atm:
+    path: "models/det_ATMgzwp_yolov8s_0615_640x640_fp16_1b.bmodel"
+    init_func_name: "init_yolov8_det_model"
+    function_name: "inference_yolo_gzwp_atm_det_model"
+    model_type: yolo_det
+    class_names:  ["xianjin", "kapian", "shouji", "bao", "yaoshi", "yanjing"]
+    params:
+      input_height: 640           #模型推理高度 [int]  根据模型名获得 
+      input_width: 640            #模型推理宽度 [int]  根据模型名获得 
+      nms_threshold: 0.5          #NMS阈值 [float]
+      box_threshold: 0.4          #box得分阈值 [float]
+    enable_log: true
+  det_kx:
+    path: "models/det_ATMgzwp_yolov8s_0615_640x640_fp16_1b.bmodel"
+    init_func_name: "init_yolov8_det_model"
+    function_name: "inference_yolo_kx_det_model"
+    model_type: yolo_det
+    class_names:  ["kx", "kx_dk"]
+    params:
+      input_height: 640           #模型推理高度 [int]  根据模型名获得 
+      input_width: 640            #模型推理宽度 [int]  根据模型名获得 
+      nms_threshold: 0.5          #NMS阈值 [float]
+      box_threshold: 0.4          #box得分阈值 [float]
+    enable_log: true
