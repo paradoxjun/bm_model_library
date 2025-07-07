@@ -3,7 +3,7 @@ env_settings:                   #配置运行时环境变量
 
 models:
   person_det:
-    path: "models/det_person_yolov8n_1684x_f16.bmodel"
+    path: "models/det_person_yolov8n_640x640_fp16_250626.bmodel"
     init_func_name: "init_yolov8_det_model"
     function_name: "inference_yolo_person_det_model"
     model_type: yolo_det
@@ -17,7 +17,7 @@ models:
   header_det:
     path: "models/det_header_1684x_f16.bmodel"
     init_func_name: "init_yolov8_det_model"
-    function_name: "inference_yolo_header_det_model"
+    function_name: "inference_yolov8_object_det_model"
     model_type: yolo_det  # 函数输入输出参数类型相同
     class_names:  ["header"]
     params:
@@ -92,4 +92,52 @@ models:
       min_box_area: 10
       track_buffer: 30
       frame_rate: 30
-    enable_log: false
+    enable_log: true
+  gun_det:
+    path: "models/det_gun_yv8s_250327_480x480_fp32_1b.bmodel"
+    init_func_name: "init_yolov8_det_model"
+    function_name: "inference_yolov8_object_det_model"
+    model_type: yolo_det
+    class_names:  ["gun"]
+    params:
+      input_height: 640           #模型推理高度 [int]  根据模型名获得 
+      input_width: 640            #模型推理宽度 [int]  根据模型名获得 
+      nms_threshold: 0.7          #NMS阈值 [float]
+      box_threshold: 0.5          #box得分阈值 [float]
+    enable_log: true
+  door_det:
+    path: "models/det_stat_door_yv8s_250512_480x480_fp16_1b.bmodel"
+    init_func_name: "init_yolov8_det_model"
+    function_name: "inference_yolov8_object_det_model"
+    model_type: yolo_det
+    class_names:  ["door_close", "door_open"]
+    params:
+      input_height: 640           #模型推理高度 [int]  根据模型名获得 
+      input_width: 640            #模型推理宽度 [int]  根据模型名获得 
+      nms_threshold: 0.7          #NMS阈值 [float]
+      box_threshold: 0.5          #box得分阈值 [float]
+    enable_log: true
+  car_det:
+    path: "models/det_yyc_yv8s_250329_480x480_fp16_1b.bmodel"
+    init_func_name: "init_yolov8_det_model"
+    function_name: "inference_yolov8_object_det_model"
+    model_type: yolo_det
+    class_names:  ["car"]
+    params:
+      input_height: 640           #模型推理高度 [int]  根据模型名获得 
+      input_width: 640            #模型推理宽度 [int]  根据模型名获得 
+      nms_threshold: 0.7          #NMS阈值 [float]
+      box_threshold: 0.5          #box得分阈值 [float]
+    enable_log: true
+  secure_atm_det:
+    path: "models/det_secure_atm_yolov8m_640x640_240820.bmodel"
+    init_func_name: "init_yolov8_det_model"
+    function_name: "inference_yolov8_object_det_model"
+    model_type: yolo_det
+    class_names:  ["class1", "class2", "class3"]
+    params:
+      input_height: 640           #模型推理高度 [int]  根据模型名获得 
+      input_width: 640            #模型推理宽度 [int]  根据模型名获得 
+      nms_threshold: 0.7          #NMS阈值 [float]
+      box_threshold: 0.5          #box得分阈值 [float]
+    enable_log: true
