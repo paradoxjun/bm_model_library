@@ -29,6 +29,7 @@ file(GLOB_RECURSE SOURCE
     ${CMAKE_SOURCE_DIR}/src/utils/*.c*
     ${CMAKE_SOURCE_DIR}/src/ppocr/*.c*
     ${CMAKE_SOURCE_DIR}/src/bytetrack/*.c*
+    ${CMAKE_SOURCE_DIR}/src/yolo_pose/*.c*
     )
 message("HEADER: ${HEADER}")
 message("SOURCE: ${SOURCE}")

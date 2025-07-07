@@ -5,6 +5,7 @@
 
 #include "model_params.hpp"
 #include "models/yolov8_det.hpp"
+#include "models/yolov8_pose.hpp"
 #include "models/resnet.hpp"
 #include "models/resnet_nc.hpp"
 #include "bytetrack/bytetrack.h"
@@ -19,6 +20,10 @@ object_detect_result_list inference_yolo_person_det_model(YoloV8_det model, cv::
 object_detect_result_list inference_yolov8_object_det_model(YoloV8_det model, cv::Mat input_image, bool enable_logger);
 object_detect_result_list inference_yolo_screen_det_model(YoloV8_det model, cv::Mat input_image, bool enable_logger);
 object_detect_result_list inference_yolo_coco_det_model(YoloV8_det model, cv::Mat input_image, bool enable_logger);
+object_detect_result_list inference_yolo_hand_det_model(YoloV8_det model, cv::Mat input_image, bool enable_logger);
+object_detect_result_list inference_yolo_money_det_model(YoloV8_det model, cv::Mat input_image, bool enable_logger);
+object_detect_result_list inference_yolo_gzwp_atm_det_model(YoloV8_det model, cv::Mat input_image, bool enable_logger);
+object_detect_result_list inference_yolo_kx_det_model(YoloV8_det model, cv::Mat input_image, bool enable_logger);
 
 RESNET* init_resnet_cls_model(std::string bmodel_file, int dev_id);
 int inference_resnet_cls_model(RESNET model, cv::Mat input_image, bool enable_logger);
