@@ -150,7 +150,7 @@ int main(int argc, char** argv) {
 		int bottom = det_result.results[i].box.bottom;
 		cv::Mat img_crop = input_image(cv::Rect(left, top, right - left, bottom - top));
 		cls_model_result cls_result = cls_inference_model(cls_model, img_crop, enable_log);
-		std::cout << "模型输出类别: " << cls_result.num_class << std::endl;
+		std::cout << "模型输出类别数量: " << cls_result.num_class << std::endl;
 		for (int i=0; i < cls_result.num_class; i++){
 			std::cout << "类别: " << cls_class_names[i] << " 输出: " << class_values[i][cls_result.cls_output[i]] << std::endl;
 		}

@@ -6,6 +6,7 @@ models
 tests/*.jpg
 tests/*.mp4
 tests/*.zip
+tests/*.png
 
 !include/models/
 !src/libbm_model_library.so
