@@ -189,3 +189,12 @@ models:
       nms_threshold: 0.5          #NMS阈值 [float]
       box_threshold: 0.4          #box得分阈值 [float]
     enable_log: true
+  cls_stat_door:
+    path: "models/cls_stat_door_1684x_F16.bmodel"
+    init_func_name: "init_multi_class_model"
+    function_name: "inference_face_attr_model"
+    model_type: multi_class
+    class_names:  ["door_status"]
+    class_values:
+      - ["door_close", "door_open"]   # 类别 0: 是否开门
+    enable_log: false

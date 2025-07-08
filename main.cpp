@@ -114,8 +114,13 @@ int main(int argc, char** argv) {
 		std::cout << "Success to inference model" << std::endl;
 		delete model;
 		std::cout << "Success to destroy model" << std::endl;
-	}else if (model_type == "res_rec") { // 分类模型
+	}else if (model_type == "res_rec") { // 单分类模型
 		std::cout << "Start to inference classification model" << std::endl;
+		// 读取models.yaml文件的class_names
+		std::vector<std::string> class_names;
+		for (const auto& class_name : model_node["class_names"]) {
+			class_names.push_back(class_name.as<std::string>());
+		}
 		InitResNetClsModelFunc init_model = (InitResNetClsModelFunc)dlsym(handle, init_func_name.c_str());
 		InferenceResNetClsModelFunc inference_model = (InferenceResNetClsModelFunc)dlsym(handle, infer_func_name.c_str());
 		RESNET* model = init_model(bmodel_file, dev_id);
@@ -126,13 +131,26 @@ int main(int argc, char** argv) {
 		std::cout << "Success to destroy model" << std::endl;
 	}else if (model_type == "multi_class") { // 多分类模型
 		std::cout << "Start to inference classification model" << std::endl;
+		std::vector<std::string> class_names;
+		for (const auto& class_name : model_node["class_names"]) {
+			class_names.push_back(class_name.as<std::string>());
+		}
+		std::vector<std::vector<std::string>> class_values;
+		YAML::Node class_values_node = model_node["class_values"];  // Fixed fs -> config
+		for (YAML::const_iterator it = class_values_node.begin(); it != class_values_node.end(); ++it) {
+			std::vector<std::string> values;
+			for (YAML::const_iterator jt = it->begin(); jt != it->end(); ++jt) {
+				values.push_back(jt->as<std::string>());
+			}
+			class_values.push_back(values);
+		}
 		InitMultiClassModelFunc init_model = (InitMultiClassModelFunc)dlsym(handle, init_func_name.c_str());
 		InferenceMultiClassModelFunc inference_model = (InferenceMultiClassModelFunc)dlsym(handle, infer_func_name.c_str());
 		RESNET_NC* model = init_model(bmodel_file, dev_id);
 		cls_model_result cls_result = inference_model(model, input_image, enable_log);
-		std::cout << "模型输出类别: " << cls_result.num_class << std::endl;
+		std::cout << "模型输出类别数量: " << cls_result.num_class << std::endl;
 		for (int i=0; i < cls_result.num_class; i++){
-			std::cout << "类别: " << i << " 输出: " << cls_result.cls_output[i] << std::endl;
+			std::cout << "类别: " << class_names[i] << " 输出: " << class_values[i][cls_result.cls_output[i]] << std::endl;
 		}
 		delete model;
 		std::cout << "Success to destroy model" << std::endl;
