@@ -130,17 +130,17 @@ models:
       box_threshold: 0.5          #box得分阈值 [float]
     enable_log: true
   secure_atm_det:
-    path: "models/det_secure_atm_yolov8m_640x640_240820.bmodel"
+    path: "models/det_secure_atm_yolov8m_480x480_240820.bmodel"
     init_func_name: "init_yolov8_det_model"
     function_name: "inference_yolov8_object_det_model"
     model_type: yolo_det
-    class_names:  ["class1", "class2", "class3"]
+    class_names:  ["bangzi", "zhuantou", "chuzi"] # 棒子、砖头、锤子
     params:
-      input_height: 640           #模型推理高度 [int]  根据模型名获得 
-      input_width: 640            #模型推理宽度 [int]  根据模型名获得 
+      input_height: 480           #模型推理高度 [int]  根据模型名获得 
+      input_width: 480            #模型推理宽度 [int]  根据模型名获得 
       nms_threshold: 0.7          #NMS阈值 [float]
       box_threshold: 0.5          #box得分阈值 [float]
-    enable_log: false
+    enable_log: true
   det_hand:
     path: "models/det_money_yolov8s_x1.0_250516_fp16_1b.bmodel"
     init_func_name: "init_yolov8_det_model"
