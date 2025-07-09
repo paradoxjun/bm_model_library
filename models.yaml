@@ -198,3 +198,15 @@ models:
     class_values:
       - ["door_close", "door_open"]   # 类别 0: 是否开门
     enable_log: false
+  knife_det:
+    path: "models/det_knife_yolov8n_640x640_F16_250709.bmodel"
+    init_func_name: "init_yolov8_det_model"
+    function_name: "inference_yolov8_object_det_model"
+    model_type: yolo_det
+    class_names:  ["knife"]
+    params:
+      input_height: 640           #模型推理高度 [int]  根据模型名获得 
+      input_width: 640            #模型推理宽度 [int]  根据模型名获得 
+      nms_threshold: 0.7          #NMS阈值 [float]
+      box_threshold: 0.5          #box得分阈值 [float]
+    enable_log: true
