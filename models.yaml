@@ -210,3 +210,15 @@ models:
       nms_threshold: 0.7          #NMS阈值 [float]
       box_threshold: 0.5          #box得分阈值 [float]
     enable_log: true
+  stick_obb:
+    path: "models/obb_stick_yv8s_250418_800x800_fp16_1b.bmodel"
+    init_func_name: "init_yolov8_obb_model"
+    function_name: "inference_yolo_stick_obb_model"
+    model_type: yolo_obb
+    class_names:  ["stick"]
+    params:
+      input_height: 800           #模型推理高度 [int]  根据模型名获得 
+      input_width: 800            #模型推理宽度 [int]  根据模型名获得 
+      nms_threshold: 0.7          #NMS阈值 [float]
+      box_threshold: 0.5          #box得分阈值 [float]
+    enable_log: true

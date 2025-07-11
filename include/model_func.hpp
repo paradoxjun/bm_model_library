@@ -6,6 +6,7 @@
 #include "model_params.hpp"
 #include "models/yolov8_det.hpp"
 #include "models/yolov8_pose.hpp"
+#include "models/yolov8_obb.hpp"
 #include "models/resnet.hpp"
 #include "models/resnet_nc.hpp"
 #include "bytetrack/bytetrack.h"
@@ -36,6 +37,9 @@ ocr_result_list inference_ppocr_det_rec_model(std::string bmodel_det, std::strin
 
 BYTETracker* init_bytetrack_model(bytetrack_params track_params);
 STracks inference_person_bytetrack_model(BYTETracker bytetrack, object_detect_result_list result, bool enable_logger);
+
+YoloV8_obb* init_yolov8_obb_model(std::string bmodel_file, int dev_id, model_inference_params params, std::vector<std::string> model_class_names);
+object_obb_result_list inference_yolo_stick_obb_model(YoloV8_obb model, cv::Mat input_image, bool enable_logger);
 
 #ifdef __cplusplus
 }
