@@ -22,6 +22,7 @@ file(GLOB_RECURSE HEADER
     ${CMAKE_SOURCE_DIR}/include/ppocr/*.h*
     ${CMAKE_SOURCE_DIR}/include/utils/*.h*
     ${CMAKE_SOURCE_DIR}/include/bytetrack/*.h*
+
     )
 file(GLOB_RECURSE SOURCE 
     ${CMAKE_SOURCE_DIR}/src/yolo_det/*.c*
@@ -30,6 +31,7 @@ file(GLOB_RECURSE SOURCE
     ${CMAKE_SOURCE_DIR}/src/ppocr/*.c*
     ${CMAKE_SOURCE_DIR}/src/bytetrack/*.c*
     ${CMAKE_SOURCE_DIR}/src/yolo_pose/*.c*
+    ${CMAKE_SOURCE_DIR}/src/yolo_obb/*.c*
     )
 message("HEADER: ${HEADER}")
 message("SOURCE: ${SOURCE}")

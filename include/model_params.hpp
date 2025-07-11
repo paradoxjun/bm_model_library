@@ -9,6 +9,7 @@ typedef struct cls_model_result {
 	int cls_output[OBJ_NUMB_MAX_SIZE];
 } cls_model_result;  // 分类模型输出结果
 
+// det
 typedef struct {
     int left;
     int top;
@@ -27,6 +28,30 @@ typedef struct {
 	int count;
 	object_detect_result results[OBJ_NUMB_MAX_SIZE];
 } object_detect_result_list;
+
+// obb
+typedef struct {
+    int x1;
+    int y1;
+    int x2;
+    int y2;
+	int x3;
+	int y3;
+	int x4;
+	int y4;
+} image_obb_t;
+
+typedef struct {
+    image_obb_t box;
+    float score;
+    int class_id;
+} object_obb_result;
+
+typedef struct {
+    int id;
+    int count;
+    object_obb_result results[OBJ_NUMB_MAX_SIZE];
+} object_obb_result_list;
 
 //ppocr
 typedef struct {

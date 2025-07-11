@@ -13,6 +13,10 @@ export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:${shared_library_abs_directory}
 typedef YoloV8_det* (*InitYOLODetModelFunc)(std::string bmodel_file, int dev_id, model_inference_params params, std::vector<std::string> model_class_names);
 typedef object_detect_result_list (*InferenceYOLODetModelFunc)(YoloV8_det* model, cv::Mat input_image, bool enable_logger);
 
+// yolo obb
+typedef YoloV8_obb* (*InitYOLOObbModelFunc)(std::string bmodel_file, int dev_id, model_inference_params params, std::vector<std::string> model_class_names);
+typedef object_obb_result_list (*InferenceYOLOObbModelFunc)(YoloV8_obb* model, cv::Mat input_image, bool enable_logger);
+
 // resnet cls
 typedef RESNET* (*InitResNetClsModelFunc)(std::string bmodel_file, int dev_id);
 typedef int (*InferenceResNetClsModelFunc)(RESNET* model, cv::Mat input_image, bool enable_logger);
@@ -171,6 +175,40 @@ int main(int argc, char** argv) {
 		// int ret = inference_model(det_model, rec_model);
 		ocr_result_list result = inference_model(det_bmodel_file, rec_bmodel_file, input_image, enable_log);
 		std::cout << "Success to inference model" << std::endl;
+	}else if (model_type == "yolo_obb") { // yolo旋转框检测模型
+		std::cout << "Start to load model" << std::endl;
+		InitYOLOObbModelFunc init_model = (InitYOLOObbModelFunc)dlsym(handle, init_func_name.c_str());
+		InferenceYOLOObbModelFunc inference_model = (InferenceYOLOObbModelFunc)dlsym(handle, infer_func_name.c_str());
+
+		model_inference_params params;
+		params.input_height = model_node["params"]["input_height"].as<int>();
+		params.input_width = model_node["params"]["input_width"].as<int>();
+		params.nms_threshold = model_node["params"]["nms_threshold"].as<float>();
+		params.box_threshold = model_node["params"]["box_threshold"].as<float>();
+		// 读取models.yaml文件的class_names
+		std::vector<std::string> class_names;
+		for (const auto& class_name : model_node["class_names"]) {
+			class_names.push_back(class_name.as<std::string>());
+			std::cout << class_name.as<std::string>() << std::endl;
+		}
+		// initialize net
+		YoloV8_obb* model = init_model(bmodel_file, dev_id, params, class_names);
+		if (!model) {
+			std::cerr << "Failed to initialize model" << std::endl;
+			return -1;
+		}
+		std::cout << "init model done" << std::endl;
+		if (input_image.empty()) {
+			std::cerr << "Empty input image" << std::endl;
+			delete model;
+			return -1;
+		}
+		object_obb_result_list result = inference_model(model, input_image, enable_log);
+		std::cout << "inference model done" << std::endl;
+		std::cout << "result size: " << result.count << std::endl;
+		std::cout << "Success to inference model" << std::endl;
+		delete model;
+		std::cout << "Success to destroy model" << std::endl;
 	}
 	else {
 		std::cout << "model_type ERROR !" << std::endl;
