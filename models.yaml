@@ -222,3 +222,42 @@ models:
       nms_threshold: 0.7          #NMS阈值 [float]
       box_threshold: 0.5          #box得分阈值 [float]
     enable_log: true
+  ren_pose: # 人体关键点yolo检测模型
+    path: "models/yolov8s-pose_640x640_fp32_1b.bmodel"
+    init_func_name: "init_yolov8_pose_model"
+    function_name: "inference_yolov8_ren_pose_model"
+    model_type: yolo_pose
+    class_names:  ["ren"]
+    params:
+      input_height: 640           #模型推理高度 [int]  根据模型名获得 
+      input_width: 640            #模型推理宽度 [int]  根据模型名获得 
+      nms_threshold: 0.7          #NMS阈值 [float]
+      box_threshold: 0.5          #box得分阈值 [float]
+      kpt_nums: 17
+    enable_log: true
+  kx_hp_pose: # 横平款箱关键点yolo检测模型
+    path: "models/pose_kx_hp_yolov8n_x1.0_480x480_250416_fp16_1b.bmodel"
+    init_func_name: "init_yolov8_pose_model"
+    function_name: "inference_yolov8_kx_hp_pose_model"
+    model_type: yolo_pose
+    class_names:  ["kx_hp"]
+    params:
+      input_height: 480           #模型推理高度 [int]  根据模型名获得 
+      input_width: 480            #模型推理宽度 [int]  根据模型名获得 
+      nms_threshold: 0.7          #NMS阈值 [float]
+      box_threshold: 0.5          #box得分阈值 [float]
+      kpt_nums: 6
+    enable_log: true
+  kx_sz_pose: # 竖直款箱关键点yolo检测模型
+    path: "models/pose_kx_sz_yolov8n_x1.0_480x480_250416_fp16_1b.bmodel"
+    init_func_name: "init_yolov8_pose_model"
+    function_name: "inference_yolov8_kx_sz_pose_model"
+    model_type: yolo_pose
+    class_names:  ["kx_hp"]
+    params:
+      input_height: 480           #模型推理高度 [int]  根据模型名获得 
+      input_width: 480            #模型推理宽度 [int]  根据模型名获得 
+      nms_threshold: 0.7          #NMS阈值 [float]
+      box_threshold: 0.5          #box得分阈值 [float]
+      kpt_nums: 2
+    enable_log: true

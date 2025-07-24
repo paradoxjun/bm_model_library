@@ -17,6 +17,10 @@ typedef object_detect_result_list (*InferenceYOLODetModelFunc)(YoloV8_det* model
 typedef YoloV8_obb* (*InitYOLOObbModelFunc)(std::string bmodel_file, int dev_id, model_inference_params params, std::vector<std::string> model_class_names);
 typedef object_obb_result_list (*InferenceYOLOObbModelFunc)(YoloV8_obb* model, cv::Mat input_image, bool enable_logger);
 
+// yolo pose
+typedef YoloV8_pose* (*InitYOLOPoseModelFunc)(std::string bmodel_file, int dev_id, model_pose_inference_params params, std::vector<std::string> model_class_names);
+typedef object_pose_result_list (*InferenceYOLOPoseModelFunc)(YoloV8_pose* model, cv::Mat input_image, bool enable_logger);
+
 // resnet cls
 typedef RESNET* (*InitResNetClsModelFunc)(std::string bmodel_file, int dev_id);
 typedef int (*InferenceResNetClsModelFunc)(RESNET* model, cv::Mat input_image, bool enable_logger);
@@ -209,6 +213,42 @@ int main(int argc, char** argv) {
 		std::cout << "Success to inference model" << std::endl;
 		delete model;
 		std::cout << "Success to destroy model" << std::endl;
+	}
+	else if (model_type == "yolo_pose") {
+    InitYOLOPoseModelFunc init_model = (InitYOLOPoseModelFunc)dlsym(handle, init_func_name.c_str());
+    InferenceYOLOPoseModelFunc inference_model = (InferenceYOLOPoseModelFunc)dlsym(handle, infer_func_name.c_str());
+
+    if (!init_model || !inference_model) {
+        std::cerr << "dlsym failed: " << dlerror() << std::endl;
+        return -1;
+    }
+
+    model_pose_inference_params params;
+    params.input_height = model_node["params"]["input_height"].as<int>();
+    params.input_width = model_node["params"]["input_width"].as<int>();
+    params.nms_threshold = model_node["params"]["nms_threshold"].as<float>();
+    params.box_threshold = model_node["params"]["box_threshold"].as<float>();
+    params.kpt_nums = model_node["params"]["kpt_nums"].as<int>();
+
+    std::vector<std::string> class_names;
+    for (const auto& class_name : model_node["class_names"]) {
+        class_names.push_back(class_name.as<std::string>());
+    }
+
+    YoloV8_pose* model = init_model(bmodel_file, dev_id, params, class_names);
+    if (!model) {
+        std::cerr << "init_model returned nullptr" << std::endl;
+        return -1;
+    }
+
+    if (input_image.empty()) {
+        std::cerr << "Empty input image" << std::endl;
+        delete model;
+        return -1;
+    }
+
+    object_pose_result_list result = inference_model(model, input_image, enable_log);
+    delete model;
 	}
 	else {
 		std::cout << "model_type ERROR !" << std::endl;
