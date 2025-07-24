@@ -64,6 +64,40 @@ typedef struct {
 	ocr_box results[OBJ_NUMB_MAX_SIZE];
 } ocr_result_list;
 
+// pose
+/*
+#define KEY_POINTS_MAX_SIZE 17
+typedef struct {
+    image_rect_t box;
+    float score;
+    int points_num;
+    float points[KEY_POINTS_MAX_SIZE * 3];
+} object_pose_result;
+
+// 模板静态分配，减少分配时间
+template<int K>
+struct object_pose_result_t {
+    image_rect_t box;
+    float score;
+    int points_num;
+    std::array<float, K*3> points;
+};
+*/
+
+struct object_pose_result {
+    image_rect_t box;
+    float score;
+    int points_num;
+    std::vector<float> points;   // 大小 = points_num*3
+};
+
+typedef struct {
+    int id;
+    int count;
+    object_pose_result results[OBJ_NUMB_MAX_SIZE];
+} object_pose_result_list;
+
+
 /* inference params */
 typedef struct model_inference_params {
 	int input_height;
@@ -71,4 +105,12 @@ typedef struct model_inference_params {
 	float nms_threshold;
 	float box_threshold;
 }model_inference_params;
+
+typedef struct model_pose_inference_params {
+    int input_height;
+    int input_width;
+    float nms_threshold;
+    float box_threshold;
+    int kpt_nums;
+}model_pose_inference_params;
 #endif 

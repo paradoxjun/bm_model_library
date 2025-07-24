@@ -46,12 +46,27 @@ bmcv_color_t YoloV8_pose::GetBmColor() {
 
 YoloV8_pose::YoloV8_pose(std::shared_ptr<BMNNContext> context) : 
     m_bmContext(context),
-    m_colorIndex(0) {
-    std::cout << "YoloV8_pose ctor .." << std::endl;
+    m_colorIndex(0),
+    m_ts(nullptr) {
+    // std::cout << "YoloV8_pose ctor .." << std::endl;
+}
+
+// NEW 重载实现（只多了一行 m_points_num = kpt_nums）
+YoloV8_pose::YoloV8_pose(std::shared_ptr<BMNNContext> context, int kpt_nums) :
+    m_bmContext(context),
+    m_points_num(kpt_nums),      // 关键点个数重设
+    m_colorIndex(0),
+    m_ts(nullptr) {
+    // std::cout << "YoloV8_pose ctor (kpt=" << kpt_nums << ") .." << std::endl;
+}
+
+// 取句柄的接口
+bm_handle_t YoloV8_pose::getHandle() const {
+    return m_bmContext->handle();
 }
 
 YoloV8_pose::~YoloV8_pose() {
-    std::cout << "YoloV8_pose dtor ..." << std::endl;
+    // std::cout << "YoloV8_pose dtor ..." << std::endl;
     bm_image_free_contiguous_mem(max_batch, m_resized_imgs.data());
     bm_image_free_contiguous_mem(max_batch, m_converto_imgs.data());
     for (int i = 0; i < max_batch; i++) {
@@ -122,23 +137,23 @@ int YoloV8_pose::batch_size() {
 int YoloV8_pose::Detect(const std::vector<bm_image>& input_images, std::vector<poseBoxVec>& boxes) {
     int ret = 0;
     // 3. preprocess
-    m_ts->save("yolov8_pose preprocess", input_images.size());
+    if (m_ts) m_ts->save("yolov8_pose preprocess", input_images.size());
     ret = pre_process(input_images);
     CV_Assert(ret == 0);
-    m_ts->save("yolov8_pose preprocess", input_images.size());
+    if (m_ts) m_ts->save("yolov8_pose preprocess", input_images.size());
 
     // 4. forward
-    m_ts->save("yolov8_pose inference", input_images.size());
+    if (m_ts) m_ts->save("yolov8_pose inference", input_images.size());
     ret = m_bmNetwork->forward();
     CV_Assert(ret == 0);
-    m_ts->save("yolov8_pose inference", input_images.size());
+    if (m_ts) m_ts->save("yolov8_pose inference", input_images.size());
 
     // 5. post process
-    m_ts->save("yolov8_pose postprocess", input_images.size());
+    if (m_ts) m_ts->save("yolov8_pose postprocess", input_images.size());
     ret = post_process(input_images, boxes);
     
     CV_Assert(ret == 0);
-    m_ts->save("yolov8_pose postprocess", input_images.size());
+    if (m_ts) m_ts->save("yolov8_pose postprocess", input_images.size());
     return ret;
 }
 
@@ -434,7 +449,11 @@ void YoloV8_pose::draw_bmcv(bm_handle_t& handle,
     if (putScore){
         //Get the label for the class name and its confidence
         std::string label = "score: " + cv::format("%.2f", b.score < 1 ? b.score * 100 : b.score);
-        bmcv_point_t org = {b.x1, b.y1 - 5};
+
+        int org_x = static_cast<int>(b.x1);
+        int org_y = static_cast<int>(b.y1 - 5);   // 可以再做边界检查
+        bmcv_point_t org{ org_x, org_y };
+
         if (frame.width - org.x  < 200) {
             org.x = frame.width - 200;
         }
@@ -447,7 +466,7 @@ void YoloV8_pose::draw_bmcv(bm_handle_t& handle,
 
     int pointsNum = b.keyPoints.size() / 3;
     std::vector<bmcv_point_t> bmPointsStart, bmPointsEnd;
-    if (pointsNum != 17) {
+    if (pointsNum != m_points_num) {    // 17个a点修改成自定义点数
         return;
     }
     bmPointsStart.reserve(pointLinks.size());
