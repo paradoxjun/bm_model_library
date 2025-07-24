@@ -1,7 +1,7 @@
 #include <iostream>
 #include <dlfcn.h>
+#include <chrono>
 #include "include/model_func.hpp"
-
 #include "yaml-cpp/yaml.h"
 /*
 在链接动态库时可能会遇到找不到库的问题，解决方法如下：
@@ -117,9 +117,13 @@ int main(int argc, char** argv) {
 		}
 		// initialize net
 		YoloV8_det* model = init_model(bmodel_file, dev_id, params, class_names);
+		auto start = std::chrono::high_resolution_clock::now();
 		object_detect_result_list result = inference_model(model, input_image, enable_log);
 		std::cout << "result size: " << result.count << std::endl;
 		std::cout << "Success to inference model" << std::endl;
+		auto end = std::chrono::high_resolution_clock::now();
+		auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
+		std::cout << "yolo模型执行时间: " << duration.count() << " 毫秒" << std::endl;
 		delete model;
 		std::cout << "Success to destroy model" << std::endl;
 	}else if (model_type == "res_rec") { // 单分类模型

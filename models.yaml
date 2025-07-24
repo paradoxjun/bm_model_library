@@ -38,8 +38,7 @@ models:
       - ["no_mask", "mask_face"]            # 类别 2：是否戴口罩
     enable_log: false
   call_up:
-    # path: "models/cls_callup_1684x_F16.bmodel"
-    path: "models/callup_smoke_1684x_F16.bmodel"
+    path: "models/cls_callup_smoke_v4_224x224_F32.bmodel"
     init_func_name: "init_multi_class_model"
     function_name: "inference_callup_smoke_model"
     model_type: multi_class
@@ -94,7 +93,8 @@ models:
       frame_rate: 30
     enable_log: true
   gun_det:
-    path: "models/det_gun_yv8s_250327_480x480_fp32_1b.bmodel"
+    # path: "models/det_gun_yv8s_250327_480x480_fp32_1b.bmodel"
+    path: "models/det_gun_yolov8n_640x640_250723.bmodel"
     init_func_name: "init_yolov8_det_model"
     function_name: "inference_yolov8_object_det_model"
     model_type: yolo_det
@@ -104,7 +104,7 @@ models:
       input_width: 640            #模型推理宽度 [int]  根据模型名获得 
       nms_threshold: 0.7          #NMS阈值 [float]
       box_threshold: 0.5          #box得分阈值 [float]
-    enable_log: true
+    enable_log: false
   door_det:
     path: "models/det_stat_door_yv8s_250512_480x480_fp16_1b.bmodel"
     init_func_name: "init_yolov8_det_model"
@@ -222,6 +222,16 @@ models:
       nms_threshold: 0.7          #NMS阈值 [float]
       box_threshold: 0.5          #box得分阈值 [float]
     enable_log: true
+  cls_person_sit_stand:
+    path: "models/cls_posture_v2_1684x_F16.bmodel"
+    init_func_name: "init_multi_class_model"
+    function_name: "inference_pose_posture_model"
+    model_type: multi_class
+    class_names:  ["posture"]
+    class_values:
+      - ["neg", "sit", "stand"]   # 行人姿态：负样本、坐立、站立
+    enable_log: true
+
   ren_pose: # 人体关键点yolo检测模型
     path: "models/yolov8s-pose_640x640_fp32_1b.bmodel"
     init_func_name: "init_yolov8_pose_model"
