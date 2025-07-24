@@ -271,3 +271,25 @@ models:
       box_threshold: 0.5          #box得分阈值 [float]
       kpt_nums: 2
     enable_log: true
+  
+  rec_ren:  # 人员识别
+    path: "models/rec_ren_resnet18_x0.36_256x128_250122_fp16_1b.bmodel"
+    init_func_name: "init_resnet_cls_model"
+    function_name: "inference_rec_ren_model"
+    model_type: res_rec
+    class_names:  ["anbao", "baojie", "worker", "yayun", "ren"]
+    enable_log: true
+  rec_hand: # 手部动作识别
+    path: "models/rec_hand_resnet18_x0.27_160x160_250219_fp16_1b.bmodel"
+    init_func_name: "init_resnet_cls_model"
+    function_name: "inference_rec_hand_model"
+    model_type: res_rec
+    class_names:  ["gp", "qm", "wsj", "gp_sz", "other"]
+    enable_log: true
+  rec_kx_orient: # 款箱朝向识别
+    path: "models/rec_kx_orient_resnet18_x0.16_160x160_250220_fp16_1b.bmodel"
+    init_func_name: "init_resnet_cls_model"
+    function_name: "inference_rec_kx_orient_model"
+    model_type: res_rec
+    class_names:  ["hp", "sz", "dk", "wx"]
+    enable_log: true

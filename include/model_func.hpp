@@ -28,6 +28,9 @@ object_detect_result_list inference_yolo_kx_det_model(YoloV8_det model, cv::Mat 
 
 RESNET* init_resnet_cls_model(std::string bmodel_file, int dev_id);
 int inference_resnet_cls_model(RESNET model, cv::Mat input_image, bool enable_logger);
+cls_result inference_rec_ren_model(RESNET model, cv::Mat input_image, bool enable_logger);
+cls_result inference_rec_hand_model(RESNET model, cv::Mat input_image, bool enable_logger);
+cls_result inference_rec_kx_orient_model(RESNET model, cv::Mat input_image, bool enable_logger);
 
 RESNET_NC* init_multi_class_model(std::string bmodel_file, int dev_id);
 cls_model_result inference_face_attr_model(RESNET_NC model, cv::Mat input_image, bool enable_logger);

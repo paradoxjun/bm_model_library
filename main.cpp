@@ -24,6 +24,7 @@ typedef object_pose_result_list (*InferenceYOLOPoseModelFunc)(YoloV8_pose* model
 // resnet cls
 typedef RESNET* (*InitResNetClsModelFunc)(std::string bmodel_file, int dev_id);
 typedef int (*InferenceResNetClsModelFunc)(RESNET* model, cv::Mat input_image, bool enable_logger);
+typedef cls_result (*InferenceResNetClsModelRetFunc)(RESNET* model, cv::Mat input_image, bool enable_logger);
 
 // face_attr
 typedef RESNET_NC* (*InitMultiClassModelFunc)(std::string bmodel_file, int dev_id);
@@ -134,10 +135,10 @@ int main(int argc, char** argv) {
 			class_names.push_back(class_name.as<std::string>());
 		}
 		InitResNetClsModelFunc init_model = (InitResNetClsModelFunc)dlsym(handle, init_func_name.c_str());
-		InferenceResNetClsModelFunc inference_model = (InferenceResNetClsModelFunc)dlsym(handle, infer_func_name.c_str());
+		InferenceResNetClsModelRetFunc inference_model = (InferenceResNetClsModelRetFunc)dlsym(handle, infer_func_name.c_str());
 		RESNET* model = init_model(bmodel_file, dev_id);
 		std::cout << "Success to init model" << std::endl;
-		int ret = inference_model(model, input_image, enable_log);
+		cls_result ret = inference_model(model, input_image, enable_log);
 		std::cout << "Success to inference model" << std::endl;
 		delete model;
 		std::cout << "Success to destroy model" << std::endl;

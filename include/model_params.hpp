@@ -9,6 +9,12 @@ typedef struct cls_model_result {
 	int cls_output[OBJ_NUMB_MAX_SIZE];
 } cls_model_result;  // 分类模型输出结果
 
+typedef struct {
+    int class_id;   // 预测类别
+    float score;      // 置信度
+} cls_result;
+
+
 // det
 typedef struct {
     int left;
