@@ -16,6 +16,10 @@
 #include "bmruntime_interface.h"
 #include "bmruntime_cpp.h"
 // #include "bm_wrapper.hpp"
+#include <set>
+#include <unordered_map>
+#include <vector>
+#include <cassert>
 
 /*
  * Any class that inherits this class cannot be assigned.
