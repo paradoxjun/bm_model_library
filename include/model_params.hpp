@@ -119,4 +119,10 @@ typedef struct model_pose_inference_params {
     float box_threshold;
     int kpt_nums;
 }model_pose_inference_params;
+
+typedef struct model_posepointnet_inference_params {
+    bool img_size_from_frame;
+    float img_w;
+    float img_h;
+}model_posepointnet_inference_params;
 #endif 

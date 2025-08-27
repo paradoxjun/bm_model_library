@@ -250,7 +250,7 @@ models:
     init_func_name: "init_yolov8_pose_model"
     function_name: "inference_yolov8_kx_hp_pose_model"
     model_type: yolo_pose
-    class_names:  ["kx_sp"]
+    class_names:  ["kx_sz"]
     params:
       input_height: 480           #模型推理高度 [int]  根据模型名获得 
       input_width: 480            #模型推理宽度 [int]  根据模型名获得 

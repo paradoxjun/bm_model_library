@@ -9,6 +9,7 @@
 #include "models/yolov8_obb.hpp"
 #include "models/resnet.hpp"
 #include "models/resnet_nc.hpp"
+#include "models/pose_pointnet.hpp"
 #include "bytetrack/bytetrack.h"
 
 
@@ -48,6 +49,9 @@ YoloV8_pose* init_yolov8_pose_model(std::string bmodel_file, int dev_id, model_p
 object_pose_result_list inference_yolov8_ren_pose_model(YoloV8_pose model, cv::Mat input_image, bool enable_logger);
 object_pose_result_list inference_yolov8_kx_hp_pose_model(YoloV8_pose model, cv::Mat input_image, bool enable_logger);
 object_pose_result_list inference_yolov8_kx_sz_pose_model(YoloV8_pose model, cv::Mat input_image, bool enable_logger);
+
+PosePointNet* init_pose_pointnet_model(std::string bmodel_file, int dev_id, model_posepointnet_inference_params params, std::vector<std::string> model_class_names);
+cls_result inference_pose_pointnet_model(PosePointNet model, const std::vector<object_pose_result_list>& pose_seq, const std::vector<object_detect_result_list>& det_seq, bool enable_logger);
 
 #ifdef __cplusplus
 }
