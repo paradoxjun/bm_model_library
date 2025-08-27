@@ -152,8 +152,13 @@ const char* track_model_name = "person_track";
 
   bool end_flag = false;
   int ind = 0;
+  int interval = 5;
   cv::Scalar color = cv::Scalar(0, 255, 0);
   while (!end_flag) {
+    if (ind % interval != 0) {
+      ++ind;
+      continue;
+    }
     bm_image* img;
     img = decoder.grab();
     if (!img) {
@@ -171,15 +176,18 @@ const char* track_model_name = "person_track";
       int box_h = track_box->tlwh[3];
       int frame_id = track_box->frame_id;
       int class_id = track_box->class_id;
-      std::string text = "track_id:" + std::to_string(track_id);
+      // std::string text = "track_id:" + std::to_string(track_id);
+      std::string text = std::to_string(track_id);
       std::cout << "frame_id:" << frame_id << " track_id:" << track_id << " class_id:" << class_id << " box:" << box_x1 << "," << box_y1 << "," << box_w << "," << box_h << std::endl;
       cv::rectangle(cv_image, cv::Point(box_x1,box_y1),cv::Point(box_x1+box_w,box_y1+box_h), color, 2);
-      cv::putText(cv_image, text, cv::Point(box_x1, box_y1-10), cv::FONT_HERSHEY_SIMPLEX, 2, cv::Scalar(0, 255, 0));
+      cv::putText(cv_image, text, cv::Point(box_x1-10, box_y1-10), cv::FONT_HERSHEY_SIMPLEX, 2, color, 2, cv::LINE_8, false);
     }
     ++ind;
     std::cout << "track_nums: " << output_stracks.size() << std::endl;
     std::string filename = save_image_path + "frame_" + std::to_string(ind) + ".jpg";
     cv::imwrite(filename, cv_image);
+    bm_image_destroy(*img);
+    cv_image.release();
   }
   
   if (handle != nullptr) {

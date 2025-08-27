@@ -8,6 +8,7 @@
 #include <dirent.h>
 #include <unistd.h>
 #include <fstream>
+#include "model_params.hpp"
 using json = nlohmann::json;
 using namespace std;
 
@@ -50,6 +51,33 @@ int inference_resnet_cls_model(RESNET model, cv::Mat input_image, bool enable_lo
     }
     return 0;
 }
+
+// cls_result inference_resnet_cls_model_ret_conf(RESNET model, cv::Mat input_image, bool enable_logger = false){
+//     /* ---------- 1. Mat → bm_image ---------- */
+//     std::vector<bm_image> batch_imgs;
+//     bm_image bmimg;
+//     cv::bmcv::toBMI(input_image, &bmimg);
+//     batch_imgs.push_back(bmimg);
+
+//     /* ---------- 2. 推理 ---------- */
+//     std::vector<std::pair<int, float>> vec;            // <class_id, score>
+//     int ret = model.Classify(batch_imgs, vec);
+//     bm_image_destroy(batch_imgs[0]);
+
+//     if (ret != 0 || vec.empty()) {
+//         std::cerr << "[resnet_cls_ret] Classify failed, ret=" << ret << std::endl;
+//         return { -1, 0.f };
+//     }
+
+//     int   class_id = vec[0].first;   // Top‑1
+//     float score    = vec[0].second;
+
+//     if (enable_logger) {
+//         std::cout << "[resnet_cls_ret] class_id: " << class_id << " score: " << score << std::endl;
+//     }
+
+//     return { class_id, score };
+// }
 
 #ifdef __cplusplus
 }

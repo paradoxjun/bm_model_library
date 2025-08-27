@@ -65,6 +65,10 @@ class YoloV8_pose {
     bmcv_color_t GetBmColor();
     public:
     YoloV8_pose(std::shared_ptr<BMNNContext> context);
+    // NEW 重载：支持外部指定关键点个数
+    YoloV8_pose(std::shared_ptr<BMNNContext> context, int kpt_nums);
+    bm_handle_t getHandle() const;      // 取句柄
+
     virtual ~YoloV8_pose();
     int Init(float confThresh=0.5, float nmsThresh=0.5);
     void enableProfile(TimeStamp *ts);

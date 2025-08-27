@@ -18,7 +18,7 @@ using namespace std;
 extern "C" {          // 确保函数名称不会在导出时被修饰
 #endif
 
-object_detect_result_list inference_yolo_header_det_model(YoloV8_det model, cv::Mat input_image, bool enable_logger=false){
+object_detect_result_list inference_yolov8_object_det_model(YoloV8_det model, cv::Mat input_image, bool enable_logger=false){
     // single image inference
     int ret = 0;
 

@@ -3,7 +3,7 @@ env_settings:                   #配置运行时环境变量
 
 models:
   person_det:
-    path: "models/det_person_yolov8n_1684x_f16.bmodel"
+    path: "models/det_person_yolov8n_640x640_fp16_250626.bmodel"
     init_func_name: "init_yolov8_det_model"
     function_name: "inference_yolo_person_det_model"
     model_type: yolo_det
@@ -17,7 +17,7 @@ models:
   header_det:
     path: "models/det_header_1684x_f16.bmodel"
     init_func_name: "init_yolov8_det_model"
-    function_name: "inference_yolo_header_det_model"
+    function_name: "inference_yolov8_object_det_model"
     model_type: yolo_det  # 函数输入输出参数类型相同
     class_names:  ["header"]
     params:
@@ -38,8 +38,7 @@ models:
       - ["no_mask", "mask_face"]            # 类别 2：是否戴口罩
     enable_log: false
   call_up:
-    # path: "models/cls_callup_1684x_F16.bmodel"
-    path: "models/callup_smoke_1684x_F16.bmodel"
+    path: "models/cls_callup_smoke_v4_224x224_F32.bmodel"
     init_func_name: "init_multi_class_model"
     function_name: "inference_callup_smoke_model"
     model_type: multi_class
@@ -92,7 +91,56 @@ models:
       min_box_area: 10
       track_buffer: 30
       frame_rate: 30
+    enable_log: true
+  gun_det:
+    # path: "models/det_gun_yv8s_250327_480x480_fp32_1b.bmodel"
+    path: "models/det_gun_yolov8n_640x640_250723.bmodel"
+    init_func_name: "init_yolov8_det_model"
+    function_name: "inference_yolov8_object_det_model"
+    model_type: yolo_det
+    class_names:  ["gun"]
+    params:
+      input_height: 640           #模型推理高度 [int]  根据模型名获得 
+      input_width: 640            #模型推理宽度 [int]  根据模型名获得 
+      nms_threshold: 0.7          #NMS阈值 [float]
+      box_threshold: 0.5          #box得分阈值 [float]
     enable_log: false
+  door_det:
+    path: "models/det_stat_door_yv8s_250512_480x480_fp16_1b.bmodel"
+    init_func_name: "init_yolov8_det_model"
+    function_name: "inference_yolov8_object_det_model"
+    model_type: yolo_det
+    class_names:  ["door_close", "door_open"]
+    params:
+      input_height: 640           #模型推理高度 [int]  根据模型名获得 
+      input_width: 640            #模型推理宽度 [int]  根据模型名获得 
+      nms_threshold: 0.7          #NMS阈值 [float]
+      box_threshold: 0.5          #box得分阈值 [float]
+    enable_log: true
+  car_det:
+    path: "models/det_yyc_yv8s_250329_480x480_fp16_1b.bmodel"
+    init_func_name: "init_yolov8_det_model"
+    function_name: "inference_yolov8_object_det_model"
+    model_type: yolo_det
+    class_names:  ["car"]
+    params:
+      input_height: 640           #模型推理高度 [int]  根据模型名获得 
+      input_width: 640            #模型推理宽度 [int]  根据模型名获得 
+      nms_threshold: 0.7          #NMS阈值 [float]
+      box_threshold: 0.5          #box得分阈值 [float]
+    enable_log: true
+  secure_atm_det:
+    path: "models/det_secure_atm_yolov8m_480x480_240820.bmodel"
+    init_func_name: "init_yolov8_det_model"
+    function_name: "inference_yolov8_object_det_model"
+    model_type: yolo_det
+    class_names:  ["bangzi", "zhuantou", "chuzi"] # 棒子、砖头、锤子
+    params:
+      input_height: 480           #模型推理高度 [int]  根据模型名获得 
+      input_width: 480            #模型推理宽度 [int]  根据模型名获得 
+      nms_threshold: 0.7          #NMS阈值 [float]
+      box_threshold: 0.5          #box得分阈值 [float]
+    enable_log: true
   det_hand:
     path: "models/det_money_yolov8s_x1.0_250516_fp16_1b.bmodel"
     init_func_name: "init_yolov8_det_model"
@@ -140,4 +188,122 @@ models:
       input_width: 640            #模型推理宽度 [int]  根据模型名获得 
       nms_threshold: 0.5          #NMS阈值 [float]
       box_threshold: 0.4          #box得分阈值 [float]
+    enable_log: true
+  cls_stat_door:
+    path: "models/cls_stat_door_1684x_F16.bmodel"
+    init_func_name: "init_multi_class_model"
+    function_name: "inference_face_attr_model"
+    model_type: multi_class
+    class_names:  ["door_status"]
+    class_values:
+      - ["door_close", "door_open"]   # 类别 0: 是否开门
+    enable_log: false
+  knife_det:
+    path: "models/det_knife_yolov8n_640x640_F16_250709.bmodel"
+    init_func_name: "init_yolov8_det_model"
+    function_name: "inference_yolov8_object_det_model"
+    model_type: yolo_det
+    class_names:  ["knife"]
+    params:
+      input_height: 640           #模型推理高度 [int]  根据模型名获得 
+      input_width: 640            #模型推理宽度 [int]  根据模型名获得 
+      nms_threshold: 0.7          #NMS阈值 [float]
+      box_threshold: 0.5          #box得分阈值 [float]
+    enable_log: true
+  stick_obb:
+    path: "models/obb_stick_yv8s_250418_800x800_fp16_1b.bmodel"
+    init_func_name: "init_yolov8_obb_model"
+    function_name: "inference_yolo_stick_obb_model"
+    model_type: yolo_obb
+    class_names:  ["stick"]
+    params:
+      input_height: 800           #模型推理高度 [int]  根据模型名获得 
+      input_width: 800            #模型推理宽度 [int]  根据模型名获得 
+      nms_threshold: 0.7          #NMS阈值 [float]
+      box_threshold: 0.5          #box得分阈值 [float]
+    enable_log: true
+  cls_person_sit_stand:
+    path: "models/cls_posture_v2_1684x_F16.bmodel"
+    init_func_name: "init_multi_class_model"
+    function_name: "inference_pose_posture_model"
+    model_type: multi_class
+    class_names:  ["posture"]
+    class_values:
+      - ["neg", "sit", "stand"]   # 行人姿态：负样本、坐立、站立
+    enable_log: true
+
+  ren_pose: # 人体关键点yolo检测模型
+    path: "models/yolov8s-pose_640x640_fp32_1b.bmodel"
+    init_func_name: "init_yolov8_pose_model"
+    function_name: "inference_yolov8_ren_pose_model"
+    model_type: yolo_pose
+    class_names:  ["ren"]
+    params:
+      input_height: 640           #模型推理高度 [int]  根据模型名获得 
+      input_width: 640            #模型推理宽度 [int]  根据模型名获得 
+      nms_threshold: 0.7          #NMS阈值 [float]
+      box_threshold: 0.5          #box得分阈值 [float]
+      kpt_nums: 17
+    enable_log: true
+  kx_hp_pose: # 横平款箱关键点yolo检测模型
+    path: "models/pose_kx_hp_yolov8n_x1.0_480x480_250416_fp16_1b.bmodel"
+    init_func_name: "init_yolov8_pose_model"
+    function_name: "inference_yolov8_kx_hp_pose_model"
+    model_type: yolo_pose
+    class_names:  ["kx_hp"]
+    params:
+      input_height: 480           #模型推理高度 [int]  根据模型名获得 
+      input_width: 480            #模型推理宽度 [int]  根据模型名获得 
+      nms_threshold: 0.7          #NMS阈值 [float]
+      box_threshold: 0.5          #box得分阈值 [float]
+      kpt_nums: 6
+    enable_log: true
+  kx_sz_pose: # 竖直款箱关键点yolo检测模型
+    path: "models/pose_kx_sz_yolov8n_x1.0_480x480_250416_fp16_1b.bmodel"
+    init_func_name: "init_yolov8_pose_model"
+    function_name: "inference_yolov8_kx_sz_pose_model"
+    model_type: yolo_pose
+    class_names:  ["kx_hp"]
+    params:
+      input_height: 480           #模型推理高度 [int]  根据模型名获得 
+      input_width: 480            #模型推理宽度 [int]  根据模型名获得 
+      nms_threshold: 0.7          #NMS阈值 [float]
+      box_threshold: 0.5          #box得分阈值 [float]
+      kpt_nums: 2
+    enable_log: true
+  
+  rec_ren:  # 人员识别
+    path: "models/rec_ren_resnet18_x0.36_256x128_250122_fp16_1b.bmodel"
+    init_func_name: "init_resnet_cls_model"
+    function_name: "inference_rec_ren_model"
+    model_type: res_rec
+    class_names:  ["anbao", "baojie", "worker", "yayun", "ren"]
+    enable_log: true
+  rec_hand: # 手部动作识别
+    path: "models/rec_hand_resnet18_x0.27_160x160_250219_fp16_1b.bmodel"
+    init_func_name: "init_resnet_cls_model"
+    function_name: "inference_rec_hand_model"
+    model_type: res_rec
+    class_names:  ["gp", "qm", "wsj", "gp_sz", "other"]
+    enable_log: true
+  rec_kx_orient: # 款箱朝向识别
+    path: "models/rec_kx_orient_resnet18_x0.16_160x160_250220_fp16_1b.bmodel"
+    init_func_name: "init_resnet_cls_model"
+    function_name: "inference_rec_kx_orient_model"
+    model_type: res_rec
+    class_names:  ["hp", "sz", "dk", "wx"]
+    enable_log: true
+
+  rec_action_fall:  # 基于骨架的多人姿态/动作分类
+    path: "models/best_acc_32T17V1P_fp16_1b.bmodel"   # ← 必须与实际bmodel一致
+    init_func_name: "init_pose_pointnet_model"
+    function_name: "inference_pose_pointnet_model"
+    model_type: pose_pointnet           # 自定义类型，与你的推理入口匹配
+    class_names: ["fall", "other"]     # 任务名（外层）
+    params:
+      # 图像尺寸来源（用于归一化）
+      img_size_from_frame: false        # true=从输入帧宽高读取；false=用默认值
+      default_img_w: 1920              # 当上面为false时才生效
+      default_img_h: 1080
+
     enable_log: true
