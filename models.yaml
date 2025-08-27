@@ -250,7 +250,7 @@ models:
     init_func_name: "init_yolov8_pose_model"
     function_name: "inference_yolov8_kx_hp_pose_model"
     model_type: yolo_pose
-    class_names:  ["kx_hp"]
+    class_names:  ["kx_sp"]
     params:
       input_height: 480           #模型推理高度 [int]  根据模型名获得 
       input_width: 480            #模型推理宽度 [int]  根据模型名获得 
@@ -292,4 +292,18 @@ models:
     function_name: "inference_rec_kx_orient_model"
     model_type: res_rec
     class_names:  ["hp", "sz", "dk", "wx"]
+    enable_log: true
+
+  rec_action_fall:  # 基于骨架的多人姿态/动作分类
+    path: "models/best_acc_32T17V1P_fp16_1b.bmodel"   # ← 必须与实际bmodel一致
+    init_func_name: "init_pose_pointnet_model"
+    function_name: "inference_pose_pointnet_model"
+    model_type: pose_pointnet           # 自定义类型，与你的推理入口匹配
+    class_names: ["fall", "other"]     # 任务名（外层）
+    params:
+      # 图像尺寸来源（用于归一化）
+      img_size_from_frame: false        # true=从输入帧宽高读取；false=用默认值
+      default_img_w: 1920              # 当上面为false时才生效
+      default_img_h: 1080
+
     enable_log: true
