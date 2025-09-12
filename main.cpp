@@ -31,7 +31,6 @@ typedef RESNET_NC* (*InitMultiClassModelFunc)(std::string bmodel_file, int dev_i
 typedef cls_model_result (*InferenceMultiClassModelFunc)(RESNET_NC* model, cv::Mat input_image, bool enable_logger);
 
 // pose_pointnet
-// pose_pointnet
 typedef PosePointNet* (*InitPosePointNetModelFunc)(std::string bmodel_file, int dev_id, model_posepointnet_inference_params params, std::vector<std::string> model_class_names);
 typedef cls_result (*InferencePosePointNetModelFunc)(PosePointNet* model, const std::vector<object_pose_result_list>& pose_seq, const std::vector<object_detect_result_list>& det_seq, bool enable_logger);
 

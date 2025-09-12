@@ -52,6 +52,10 @@ object_pose_result_list inference_yolov8_kx_sz_pose_model(YoloV8_pose model, cv:
 
 PosePointNet* init_pose_pointnet_model(std::string bmodel_file, int dev_id, model_posepointnet_inference_params params, std::vector<std::string> model_class_names);
 cls_result inference_pose_pointnet_model(PosePointNet model, const std::vector<object_pose_result_list>& pose_seq, const std::vector<object_detect_result_list>& det_seq, bool enable_logger);
+cls_result inference_pose_pointnet_fall_model(PosePointNet model, const std::vector<object_pose_result_list>& pose_seq, const std::vector<object_detect_result_list>& det_seq, bool enable_logger);
+cls_result inference_pose_pointnet_climb_model(PosePointNet model, const std::vector<object_pose_result_list>& pose_seq, const std::vector<object_detect_result_list>& det_seq, bool enable_logger);
+cls_result inference_pose_pointnet_fight_model(PosePointNet model, const std::vector<object_pose_result_list>& pose_seq, const std::vector<object_detect_result_list>& det_seq, bool enable_logger);
+
 
 #ifdef __cplusplus
 }
