@@ -13,7 +13,7 @@
 
 //======================= 任务常量（可按任务分别调整） =======================
 // 「摔倒检测」— 与 bmodel: best_acc_32T17V1P_fp16_1b.bmodel 对齐
-static constexpr int FALL_T_EXPECT  = 32;
+static constexpr int FALL_T_EXPECT  = 64;
 static constexpr int FALL_V_EXPECT  = 17;
 static constexpr int FALL_P_EXPECT  = 2;
 static constexpr int FALL_CG_EXPECT = 8;

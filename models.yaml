@@ -295,7 +295,7 @@ models:
     enable_log: true
 
   rec_action_fall:  # 基于骨架的多人姿态/动作分类
-    path: "models/best_acc_32T17V1P_fp16_1b.bmodel"   # ← 必须与实际bmodel一致
+    path: "models/best_acc_32T17V1P_fp16_1b_251011.bmodel"   # ← 必须与实际bmodel一致
     init_func_name: "init_pose_pointnet_model"
     function_name: "inference_pose_pointnet_fall_model"
     model_type: pose_pointnet           # 自定义类型，与你的推理入口匹配
@@ -309,7 +309,7 @@ models:
     enable_log: true
 
   rec_action_climb:  # 基于骨架的多人姿态/动作分类
-    path: "models/rec_climb_ppn_32T17V1P_fp16_1b.bmodel"   # ← 必须与实际bmodel一致
+    path: "models/best_acc_rec_climb_32T17V1P_fp16_1b_251011.bmodel"   # ← 必须与实际bmodel一致
     init_func_name: "init_pose_pointnet_model"
     function_name: "inference_pose_pointnet_climb_model"
     model_type: pose_pointnet           # 自定义类型，与你的推理入口匹配
@@ -323,7 +323,7 @@ models:
     enable_log: true
 
   rec_action_fight:  # 基于骨架的多人姿态/动作分类(打架要传两个人的数据)
-    path: "models/rec_fight_ppn_32T17V2P_fp16_1b.bmodel"   # ← 必须与实际bmodel一致
+    path: "models/best_acc_rec_fight_64T17V2P_fp16_1b_251017.bmodel"   # ← 必须与实际bmodel一致
     init_func_name: "init_pose_pointnet_model"
     function_name: "inference_pose_pointnet_fight_model"
     model_type: pose_pointnet           # 自定义类型，与你的推理入口匹配
